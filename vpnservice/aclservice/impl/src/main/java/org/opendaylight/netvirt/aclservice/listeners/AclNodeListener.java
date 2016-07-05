@@ -146,7 +146,7 @@ public class AclNodeListener extends AsyncDataTreeChangeListenerBase<FlowCapable
         } else if (securityGroupMode == SecurityGroupMode.Stateless) {
             addStatelessIngressAclTableMissFlow(dpnId);
             addStatelessEgressAclTableMissFlow(dpnId);
-        } else if (securityGroupMode == SecurityGroupMode.Learn) {
+        } else if (securityGroupMode == SecurityGroupMode.Stateful) {
             addLearnIngressAclTableMissFlow(dpnId);
             addLearnEgressAclTableMissFlow(dpnId);
         }
