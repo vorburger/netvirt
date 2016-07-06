@@ -1,13 +1,13 @@
-package org.opendaylight.netvirt.aclservice.tests;
+package org.opendaylight.netvirt.aclservice.tests.learning;
 
+import static org.opendaylight.netvirt.aclservice.tests.utils.MockitoNotImplementedExceptionAnswer.ExceptionAnswer;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 import java.io.File;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Test;
-import org.mockito.stubbing.Answer;
 
-public class MockitoAndMikitoTest {
+public class MockitoTest {
 
     interface SomeService {
 
@@ -43,13 +43,13 @@ public class MockitoAndMikitoTest {
 
     @Test(expected=NotImplementedException.class)
     public void usingMockitoExceptionException() {
-        SomeService s = mock(SomeService.class, exceptionAnswer);
+        SomeService s = mock(SomeService.class, ExceptionAnswer);
         s.foo();
     }
 
     @Test
     public void usingMockitoNoExceptionIfStubbed() {
-        SomeService s = mock(SomeService.class, exceptionAnswer);
+        SomeService s = mock(SomeService.class, ExceptionAnswer);
         // NOT when(s.foobar(any())).thenReturn(123) BUT must be like this:
         doReturn(123).when(s).foobar(any());
         assertEquals(123, s.foobar(new File("hello.txt")));
@@ -63,7 +63,7 @@ public class MockitoAndMikitoTest {
 
     @Test
     public void usingMockitoToStubComplexCaseAndExceptionIfNotStubbed() {
-        SomeService s = mock(SomeService.class, exceptionAnswer);
+        SomeService s = mock(SomeService.class, ExceptionAnswer);
         doAnswer(invocation -> {
             // Urgh! This is ugly. Mockito may be better, see http://site.mockito.org/mockito/docs/current/org/mockito/ArgumentMatcher.html
             File f = (File) invocation.getArguments()[0];
@@ -76,33 +76,5 @@ public class MockitoAndMikitoTest {
         assertEquals(123, s.foobar(new File("hello.txt")));
         assertEquals(0, s.foobar(new File("belo.txt")));
     }
-
-    @Test
-    public void usingMikitoToCallStubbedMethod() {
-        MockSomeService s = Mikito.stub(MockSomeService.class);
-        assertEquals(123, s.foobar(new File("hello.txt")));
-        assertEquals(0, s.foobar(new File("belo.txt")));
-    }
-
-    @Test(expected=NotImplementedException.class)
-    public void usingMikitoToCallUnstubbedMethodAndExpectException() {
-        MockSomeService s = Mikito.stub(MockSomeService.class);
-        s.foo();
-    }
-
-    static abstract class MockSomeService implements SomeService {
-        @Override
-        public int foobar(File f) {
-            if (f.getName().equals("hello.txt")) {
-                return 123;
-            } else {
-                return 0;
-            }
-        }
-    }
-
-    static final Answer<Void> exceptionAnswer = invocation -> {
-        throw new NotImplementedException(invocation.getMethod().getName() + " is not stubbed");
-    };
 
 }
