@@ -1,20 +1,25 @@
 package org.opendaylight.netvirt.aclservice.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
 import static org.opendaylight.netvirt.aclservice.tests.utils.MockitoNotImplementedExceptionAnswer.ExceptionAnswer;
 
 import java.math.BigInteger;
 import java.util.concurrent.Future;
 import org.junit.Before;
 import org.junit.Test;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.test.AbstractDataBrokerTest;
+import org.opendaylight.genius.mdsalutil.MDSALUtil;
+import org.opendaylight.netvirt.aclservice.AclServiceUtils;
 import org.opendaylight.netvirt.aclservice.EgressAclServiceImpl;
 import org.opendaylight.netvirt.aclservice.api.AclServiceListener;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.interfaces.InterfaceBuilder;
+import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.PhysAddress;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.genius.interfacemanager.rpcs.rev160406.GetDpidFromInterfaceOutput;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.genius.interfacemanager.rpcs.rev160406.GetDpidFromInterfaceOutputBuilder;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.genius.interfacemanager.rpcs.rev160406.OdlInterfaceRpcService;
@@ -36,6 +41,7 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
     // TODO EMail "Augmentable's Builder addAugmentation variant without first class argument? (backward compatible)"
     // TODO How to make YANG instance object construction look nicer..
     // TODO propose using Xtend - justify why .. e.g. useful for object creation with Builders?
+    // TODO how about a textual format for defining YANG store content at the start of tests?
 
     // DOC: For readability, no private etc. modifiers, unless public required by JUnit (bah)
 
@@ -46,23 +52,32 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
     AclServiceListener aclService;
 
     // Mocked other services which the main service under test depends on
+    DataBroker dataBroker;
     OdlInterfaceRpcService odlInterfaceRpcService;
 
 
     @Before public void setUp() {
+        dataBroker = getDataBroker();
+
         // TODO Personally I'd rather use my Mikito approach here .. but discuss it with others, first
         odlInterfaceRpcService = mock(OdlInterfaceRpcService.class, ExceptionAnswer);
         Future<RpcResult<GetDpidFromInterfaceOutput>> result = RpcResultBuilder.success(new GetDpidFromInterfaceOutputBuilder().setDpid(new BigInteger("123"))).buildFuture();
         doReturn(result).when(odlInterfaceRpcService).getDpidFromInterface(any());
 
-        aclService = new EgressAclServiceImpl(getDataBroker(), odlInterfaceRpcService, null);
+        aclService = new EgressAclServiceImpl(dataBroker, odlInterfaceRpcService, null);
     }
 
     @Test public void applyToPortWithSecurityEnabled() {
         InterfaceAcl acl1 = new InterfaceAclBuilder().setPortSecurityEnabled(true).build();
         Interface port1 = new InterfaceBuilder().addAugmentation(InterfaceAcl.class, acl1).setName("port1").build();
+
+        // TODO write a better helper to avoid duplicating "port1" name/Id - this should be implicit?
+        // TODO ultimately I probably won't want to use the (internal!) AclServiceUtils here.. see later how to simplify creating these IDs
+        StateInterfaceBuilder builder = new StateInterfaceBuilder().setName("port1").setPhysAddress(new PhysAddress("0D:AA:D8:42:30:F3"));
+        MDSALUtil.syncWrite(dataBroker, OPERATIONAL, AclServiceUtils.buildStateInterfaceId("port1"), builder.build());
+
         assertTrue(aclService.applyAcl(port1));
-        // assert more shit happened (in datastore), as expected
+        // TODO assert more shit happened (in datastore), as expected
     }
 
 }
