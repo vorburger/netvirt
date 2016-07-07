@@ -14,6 +14,7 @@ import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
 import org.opendaylight.genius.mdsalutil.ActionInfo;
 import org.opendaylight.genius.mdsalutil.ActionType;
+import org.opendaylight.genius.mdsalutil.FlowEntity;
 import org.opendaylight.genius.mdsalutil.InstructionInfo;
 import org.opendaylight.genius.mdsalutil.InstructionType;
 import org.opendaylight.genius.mdsalutil.MDSALUtil;
@@ -426,17 +427,16 @@ public class EgressAclServiceImpl implements AclServiceListener {
                           int idleTimeOut, int hardTimeOut, BigInteger cookie, List<? extends MatchInfoBase>  matches,
                           List<InstructionInfo> instructions, int addOrRemove) {
         if (addOrRemove == NwConstants.DEL_FLOW) {
-            MDSALUtil.buildFlowEntity(dpId, tableId, flowName, AclServiceUtils.PROTO_MATCH_PRIORITY, "ACL", 0, 0,
-                    AclServiceUtils.COOKIE_ACL_BASE, matches, null);
+            FlowEntity flowEntity = MDSALUtil.buildFlowEntity(dpId, tableId,
+                flowName, AclServiceUtils.PROTO_MATCH_PRIORITY, "ACL", 0, 0,
+                AclServiceUtils.COOKIE_ACL_BASE, matches, null);
             logger.trace("Removing Acl Flow DpnId {}, flowId {}", dpId, flowId);
-            // TODO Need to be done as a part of genius integration
-            //mdsalUtil.removeFlow(flowEntity);
+            mdsalManager.installFlow(flowEntity);
         } else {
-            MDSALUtil.buildFlowEntity(dpId, tableId,
+            FlowEntity flowEntity = MDSALUtil.buildFlowEntity(dpId, tableId,
                 flowId ,priority, flowName, 0, 0, cookie, matches, instructions);
             logger.trace("Installing DpnId {}, flowId {}", dpId, flowId);
-            // TODO Need to be done as a part of genius integration
-            //mdsalUtil.installFlow(flowEntity);
+            mdsalManager.installFlow(flowEntity);
         }
     }
 
