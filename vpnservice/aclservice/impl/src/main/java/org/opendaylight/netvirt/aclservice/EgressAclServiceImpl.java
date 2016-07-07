@@ -244,7 +244,6 @@ public class EgressAclServiceImpl implements AclServiceListener {
         instructions.add(new InstructionInfo(InstructionType.apply_actions,
             actionsInfos));
 
-
         instructions.add(new InstructionInfo(InstructionType.goto_table,
             new long[] { AclConstants.EGRESS_ACL_NEXT_TABLE_ID }));
         String flowName = "Egress_DHCP_Client_v4" + dpId + "_" + attachMac + "_" + dhcpMacAddress + "_Permit_";
@@ -282,7 +281,7 @@ public class EgressAclServiceImpl implements AclServiceListener {
 
         instructions.add(new InstructionInfo(InstructionType.goto_table,
             new long[] { AclConstants.EGRESS_ACL_NEXT_TABLE_ID }));
-        String flowName = "Egress_DHCP_Client_v4" + "_" + dpId + "_" + attachMac + "_" + dhcpMacAddress + "_Permit_";
+        String flowName = "Egress_DHCP_Client_v6" + "_" + dpId + "_" + attachMac + "_" + dhcpMacAddress + "_Permit_";
         syncFlow(dpId, AclConstants.EGRESS_ACL_TABLE_ID, flowName, AclServiceUtils.PROTO_MATCH_PRIORITY, "ACL", 0, 0,
             AclServiceUtils.COOKIE_ACL_BASE, matches, instructions, addOrRemove);
     }
@@ -429,13 +428,13 @@ public class EgressAclServiceImpl implements AclServiceListener {
         if (addOrRemove == NwConstants.DEL_FLOW) {
             MDSALUtil.buildFlowEntity(dpId, tableId, flowName, AclServiceUtils.PROTO_MATCH_PRIORITY, "ACL", 0, 0,
                     AclServiceUtils.COOKIE_ACL_BASE, matches, null);
-            logger.trace("Removing Acl Flow DpId {}, vmMacAddress {}", dpId, flowId);
+            logger.trace("Removing Acl Flow DpnId {}, flowId {}", dpId, flowId);
             // TODO Need to be done as a part of genius integration
             //mdsalUtil.removeFlow(flowEntity);
         } else {
             MDSALUtil.buildFlowEntity(dpId, tableId,
                 flowId ,priority, flowName, 0, 0, cookie, matches, instructions);
-            logger.trace("Installing  DpId {}, flowId {}", dpId, flowId);
+            logger.trace("Installing DpnId {}, flowId {}", dpId, flowId);
             // TODO Need to be done as a part of genius integration
             //mdsalUtil.installFlow(flowEntity);
         }

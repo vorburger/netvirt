@@ -30,6 +30,10 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
 public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
 
+    // TODO test more, see coverage - what's missing for ~100% ?
+    // TODO avoid extends AbstractDataBrokerTest, use @Rule instead
+    // TODO try creating DataBroker stub/mock/fake (?), using Mikito
+
     // TODO eval BDD frameworks to formalize given/when/then
     // TODO like real client, go through AclServiceProvider instead of sep. EGress / Ingress as here
     // TODO use DI, perhaps Dagger &#x2021;
@@ -75,6 +79,8 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
         // TODO ultimately I probably won't want to use the (internal!) AclServiceUtils here.. see later how to simplify creating these IDs
         StateInterfaceBuilder builder = new StateInterfaceBuilder().setName("port1").setPhysAddress(new PhysAddress("0D:AA:D8:42:30:F3"));
         MDSALUtil.syncWrite(dataBroker, OPERATIONAL, AclServiceUtils.buildStateInterfaceId("port1"), builder.build());
+
+        // NOTE Typically no real strong good need to use [Mockito's] verify() on odlInterfaceRpcService here.. remember, focus on testing the API outcome, not the implementation detail of what dependent service got called.
 
         assertTrue(aclService.applyAcl(port1));
         // TODO assert more shit happened (in datastore), as expected
