@@ -7,17 +7,60 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 /**
- * Mike's mocker.
+ * Mike's helper to easily create <a href=
+ * "http://googletesting.blogspot.ch/2013/07/testing-on-toilet-know-your-test-doubles.html">Stubes
+ * & Fakes</a>.
  *
- * <p>Mikitos are:<ul>
+ * <p>
+ * Mikitos are:
+ * <ul>
  * <li>fully type safe and refactoring resistant; whereas Mockito is not, e.g.
  * for return values with doReturn(...).when(), and uses runtime instead of
  * compile time error reporting for this.
- * <li>enforce ExceptionAnswer by default (possible with Mockito, but is easily
- * forgotten)
+ * <li>enforce ExceptionAnswer by default for non-implemented methods (which is
+ * possible with Mockito, but is easily forgotten)
  * <li>avoid confusion re. the alternative doReturn(...).when() syntax required
  * with ExceptionAnswer instead of when(...).thenReturn()
  * </ul>
+ *
+ * The current implementation internally uses Mockito. Please consider this an
+ * implementation detail. It may be changed in the future. One of the impacts of
+ * this internal use of Mockito is that because constructors (and thus
+ * field initializers) are not called by Mockito, instead of:
+ *
+ * <pre>
+ * abstract class FakeService implements Service {
+ *     private final List<Thing> things = new ArrayList<>();
+ *
+ *     public List<Thing> getThings() {
+ *         return things;
+ *     }
+ *
+ *     &#64;Override
+ *     public void installThing(Thing thing) {
+ *         things.add(thing);
+ *     }
+ * }</pre>
+ *
+ * you'll just need to do:
+ *
+ * abstract class FakeService implements Service {
+ *     private List<Thing> things;
+ *
+ *     public List<Thing> getThings() {
+ *         if (things == null)
+ *             things = new ArrayList<>()
+ *         return things;
+ *     }
+ *
+ *     &#64;Override
+ *     public void installThing(Thing thing) {
+ *         getThings().add(thing);
+ *     }
+ * }</pre>
+ *
+ * @see MikitoTest
+ * @see LearnMockitoTest
  *
  * @author Michael Vorburger
  */

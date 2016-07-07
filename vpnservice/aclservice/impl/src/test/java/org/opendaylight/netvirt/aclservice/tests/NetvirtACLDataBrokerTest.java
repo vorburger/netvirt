@@ -1,6 +1,6 @@
 package org.opendaylight.netvirt.aclservice.tests;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -17,6 +17,8 @@ import org.opendaylight.genius.mdsalutil.MDSALUtil;
 import org.opendaylight.netvirt.aclservice.AclServiceUtils;
 import org.opendaylight.netvirt.aclservice.EgressAclServiceImpl;
 import org.opendaylight.netvirt.aclservice.api.AclServiceListener;
+import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
+import org.opendaylight.netvirt.aclservice.tests.utils.FakeIMdsalApiManager;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.PhysAddress;
@@ -58,7 +60,7 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
     // Mocked other services which the main service under test depends on
     DataBroker dataBroker;
     OdlInterfaceRpcService odlInterfaceRpcService;
-
+    FakeIMdsalApiManager mdsalApiManager;
 
     @Before public void setUp() {
         dataBroker = getDataBroker();
@@ -68,7 +70,9 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
         Future<RpcResult<GetDpidFromInterfaceOutput>> result = RpcResultBuilder.success(new GetDpidFromInterfaceOutputBuilder().setDpid(new BigInteger("123"))).buildFuture();
         doReturn(result).when(odlInterfaceRpcService).getDpidFromInterface(any());
 
-        aclService = new EgressAclServiceImpl(dataBroker, odlInterfaceRpcService, null);
+        mdsalApiManager = Mikito.stub(FakeIMdsalApiManager.class);
+
+        aclService = new EgressAclServiceImpl(dataBroker, odlInterfaceRpcService, mdsalApiManager);
     }
 
     @Test public void applyToPortWithSecurityEnabled() {
@@ -83,6 +87,7 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
         // NOTE Typically no real strong good need to use [Mockito's] verify() on odlInterfaceRpcService here.. remember, focus on testing the API outcome, not the implementation detail of what dependent service got called.
 
         assertTrue(aclService.applyAcl(port1));
+        assertEquals(10, mdsalApiManager.getFlows().size());
         // TODO assert more shit happened (in datastore), as expected
     }
 

@@ -7,7 +7,7 @@ import java.io.File;
 import org.apache.commons.lang3.NotImplementedException;
 import org.junit.Test;
 
-public class MockitoTest {
+public class LearnMockitoTest {
 
     interface SomeService {
 
@@ -30,7 +30,7 @@ public class MockitoTest {
     public void usingMockitoToStubComplexCase() {
         SomeService s = mock(SomeService.class);
         when(s.foobar(any())).thenAnswer(invocation -> {
-            // Urgh! This is ugly. Mockito may be better, see http://site.mockito.org/mockito/docs/current/org/mockito/ArgumentMatcher.html
+            // Urgh! This is ugly. Mockito 2.0 may be better, see http://site.mockito.org/mockito/docs/current/org/mockito/ArgumentMatcher.html
             File f = (File) invocation.getArguments()[0];
             if (f.getName().equals("hello.txt")) {
                 return 123;
