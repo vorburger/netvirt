@@ -98,8 +98,7 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
         assertEquals(10, mdsalApiManager.getFlows().size());
         // TODO Make FlowEntry have proper equals (and hashCode) and remove toString.. see below
         assertEquals(FlowEntryObjects.flow1().toString(), mdsalApiManager.getFlows().get(0).toString());
-
-        // TODO assert more shit happened (in datastore), as expected
+        // TODO Must also assert remaining nine flows!
     }
 
     @Ignore
