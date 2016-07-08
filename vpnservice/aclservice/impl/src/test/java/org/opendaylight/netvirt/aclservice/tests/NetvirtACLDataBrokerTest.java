@@ -7,6 +7,9 @@
  */
 package org.opendaylight.netvirt.aclservice.tests;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
@@ -94,10 +97,13 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
 
         // NOTE Typically no real strong good need to use [Mockito's] verify() on odlInterfaceRpcService here.. remember, focus on testing the API outcome, not the implementation detail of what dependent service got called.
 
-        assertTrue(aclService.applyAcl(port1));
-        assertEquals(10, mdsalApiManager.getFlows().size());
+        assertThat(aclService.applyAcl(port1), is(true));
+        assertThat(mdsalApiManager.getFlows(), hasSize(10));
         // TODO Make FlowEntry have proper equals (and hashCode) and remove toString.. see below
         assertEquals(FlowEntryObjects.flow1().toString(), mdsalApiManager.getFlows().get(0).toString());
+        // TODO remove assertEquals above, and use only assertThat, once equals works...
+        // TODO DOC Hamcrest http://www.baeldung.com/hamcrest-collections-arrays, http://www.vogella.com/tutorials/Hamcrest/article.html
+        assertThat(mdsalApiManager.getFlows(), contains(FlowEntryObjects.flow1()));
         // TODO Must also assert remaining nine flows!
     }
 
