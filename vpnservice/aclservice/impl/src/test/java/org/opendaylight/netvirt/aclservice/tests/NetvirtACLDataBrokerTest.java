@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2016 Red Hat, Inc. and others. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 which accompanies this distribution,
+ * and is available at http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.opendaylight.netvirt.aclservice.tests;
 
 import static org.junit.Assert.*;
@@ -10,6 +17,7 @@ import static org.opendaylight.netvirt.aclservice.tests.utils.MockitoNotImplemen
 import java.math.BigInteger;
 import java.util.concurrent.Future;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.test.AbstractDataBrokerTest;
@@ -88,7 +96,19 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
 
         assertTrue(aclService.applyAcl(port1));
         assertEquals(10, mdsalApiManager.getFlows().size());
+        // TODO Make FlowEntry have proper equals (and hashCode) and remove toString.. see below
+        assertEquals(FlowEntryObjects.flow1().toString(), mdsalApiManager.getFlows().get(0).toString());
+
         // TODO assert more shit happened (in datastore), as expected
+    }
+
+    @Ignore
+    @Test public void compareFlowEntryWithEquals() {
+        assertEquals(FlowEntryObjects.flow1(), FlowEntryObjects.flow1());
+    }
+
+    @Test public void compareFlowEntryWithToString() {
+        assertEquals(FlowEntryObjects.flow1().toString(), FlowEntryObjects.flow1().toString());
     }
 
 }
