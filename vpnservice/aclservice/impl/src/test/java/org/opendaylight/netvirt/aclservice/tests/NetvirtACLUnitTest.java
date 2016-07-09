@@ -37,4 +37,12 @@ public class NetvirtACLUnitTest {
         assertFalse(aclService.applyAcl(port1));
     }
 
+    @Test public void compareFlowEntryWithEquals() {
+        assertEquals(FlowEntryObjects.flow1(), FlowEntryObjects.flow1());
+    }
+
+    @Test public void compareFlowEntryWithToString() {
+        assertEquals(FlowEntryObjects.flow1().toString(), FlowEntryObjects.flow1().toString());
+    }
+
 }
