@@ -30,7 +30,7 @@ import org.opendaylight.netvirt.aclservice.EgressAclServiceImpl;
 import org.opendaylight.netvirt.aclservice.api.AclServiceListener;
 import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
 import org.opendaylight.netvirt.aclservice.tests.utils.FakeIMdsalApiManager;
-import org.opendaylight.netvirt.aclservice.tests.utils.XtendWithOperatorBeanInitializationGenerator;
+import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.interfaces.Interface;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.interfaces.rev140508.interfaces.InterfaceBuilder;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.PhysAddress;
@@ -102,7 +102,7 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
         assertThat(mdsalApiManager.getFlows(), hasSize(10));
         // TODO Make FlowEntry have proper equals (and hashCode) and remove toString.. see compareFlowEntryWithEquals in NetvirtACLUnitTest
         assertEquals(FlowEntryObjects.flow1().toString(), mdsalApiManager.getFlows().get(0).toString());
-        new XtendWithOperatorBeanInitializationGenerator().print(mdsalApiManager.getFlows().get(0));
+        new XtendBeanGenerator().print(mdsalApiManager.getFlows().get(0));
         // TODO remove assertEquals above, and use only assertThat, once equals works...
         // TODO DOC Hamcrest http://www.baeldung.com/hamcrest-collections-arrays, http://www.vogella.com/tutorials/Hamcrest/article.html
         assertThat(mdsalApiManager.getFlows(), contains(FlowEntryObjects.flow1()));

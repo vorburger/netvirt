@@ -10,18 +10,17 @@ package org.opendaylight.netvirt.aclservice.tests.utils;
 import org.opendaylight.netvirt.aclservice.tests.FlowEntryObjects;
 
 /**
- * Magic. pure Magic.
+ * Java wrapper around XtendBeanGenerator.
+ *
+ * Only needed because there is some bug ("Error: Could not find or load main
+ * class org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator")
+ * which makes a main() in XtendBeanGenerator not work for some reason.
  *
  * @author Michael Vorburger
  */
-public class XtendWithOperatorBeanInitializationGenerator {
-
-    public void print(Object bean) {
-        // ReflectExtensions
-        new WithOperatorExpressionGenerator().printXtend(bean);
-    }
+public class XtendBeanGeneratorJ {
 
     public static void main(String[] args) {
-        new WithOperatorExpressionGenerator().printXtend(FlowEntryObjects.flow1());
+        new XtendBeanGenerator().print(FlowEntryObjects.flow1());
     }
 }
