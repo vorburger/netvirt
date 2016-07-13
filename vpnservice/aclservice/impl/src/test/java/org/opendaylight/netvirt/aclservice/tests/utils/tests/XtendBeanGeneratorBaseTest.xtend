@@ -93,7 +93,7 @@ class XtendBeanGeneratorBaseTest {
     }
 
     @Test def void testEnum() {
-        assertEquals("a", g.getExpression(TestEnum.a))
+        assertEquals("TestEnum.a", g.getExpression(TestEnum.a))
     }
 
     def private void assertThatEndsWith(String string, String endsWith) {

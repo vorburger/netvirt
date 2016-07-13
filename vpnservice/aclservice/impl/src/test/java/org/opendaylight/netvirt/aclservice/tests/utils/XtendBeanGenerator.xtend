@@ -152,7 +152,7 @@ class XtendBeanGenerator {
             Float     : '''«object»f'''
             Short     : '''«object» as short'''
             BigInteger: '''«object»bi'''
-            Enum      : '''«object.name»'''
+            Enum<?>   : '''«object.declaringClass.simpleName».«object.name»'''
             default   : '''«getNewBeanExpression(object)»'''
         }
     }
