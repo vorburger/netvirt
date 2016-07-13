@@ -1,6 +1,7 @@
 package org.opendaylight.netvirt.aclservice.tests.utils.tests
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test
 import org.eclipse.xtend.lib.annotations.Accessors
@@ -17,7 +18,11 @@ class XtendBeanGeneratorTest {
 
     val g = new XtendBeanGenerator()
 
-    @Test def void simple() {
+    @Test def void simplestNumberExpression() {
+        assertThatEndsWith(g.getExpression(123), "123")
+    }
+
+    @Test def void complexBean() {
         val bean = new Bean() => [
             ALongObject = 123L
             AShort = 123 as short
@@ -62,6 +67,9 @@ class XtendBeanGeneratorTest {
             ]'''.toString, g.getExpression(bean))
     }
 
+    def private void assertThatEndsWith(String string, String endsWith) {
+        assertTrue("'''" + string + "''' expected to endWith '''" + endsWith + "'''", string.endsWith(endsWith));
+    }
 
     @Accessors
     public static class Bean {
@@ -80,5 +88,4 @@ class XtendBeanGeneratorTest {
         Bean innerBean
         @Accessors(PUBLIC_GETTER) List<Bean> beanz = newArrayList
     }
-
 }
