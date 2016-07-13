@@ -5,6 +5,10 @@ import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.mockito.cglib.core.ReflectUtils
+import java.lang.reflect.Constructor
+import java.util.Map
+import java.lang.reflect.Parameter
+import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator.Property
 
 /**
  * Magic. pure. Magic.
@@ -36,9 +40,12 @@ class XtendBeanGenerator {
     }
 
     def protected CharSequence getExpressionInternal(Object bean) {
+        val properties = getBeanProperties(bean)
         '''
-        new «bean.class.simpleName»«constructorArguments(bean)» => [
-            «FOR property : getBeanProperties(bean)»
+        new «bean.class.simpleName»«constructorArguments(bean, properties)» => [
+            «FOR property : properties.filter[name, property |
+               property.isWriteable || property.type.isAssignableFrom(List)
+            ].values»
             «IF (property.value != property.defaultValue)»
             «property.name» = «stringify(property.value)»
             «ENDIF»
@@ -46,8 +53,36 @@ class XtendBeanGenerator {
         ]'''
     }
 
-    def protected constructorArguments(Object bean) {
-        ''''''
+    def protected constructorArguments(Object bean, Map<String, Property> properties) {
+        val constructors = bean.class.constructors
+        if (constructors.isEmpty) ''''''
+        else {
+            val constructor = findSuitableConstructor(constructors)
+            if (constructor == null) ''''''
+            else {
+                val parameters = constructor.parameters
+                '''«FOR parameter : parameters BEFORE '(' SEPARATOR ', ' AFTER ')'»«getConstructorParameterValue(parameter, properties)»«ENDFOR»'''
+            }
+        }
+    }
+
+    def protected getConstructorParameterValue(Parameter parameter, Map<String, Property> properties) {
+        if (!parameter.isNamePresent)
+            // https://docs.oracle.com/javase/tutorial/reflect/member/methodparameterreflection.html
+            throw new IllegalStateException("Needs javac -parameters; or, in Eclipse: 'Store information about method parameters (usable via reflection)' in Window -> Preferences -> Java -> Compiler");
+        val constructorParameterName = parameter.name
+        val value = properties.get(constructorParameterName)
+        if (value == null)
+            throw new IllegalStateException("Constructor parameter '" + constructorParameterName + "' not found in bean's properties: " + properties.keySet)
+        properties.remove(constructorParameterName)
+        return stringify(value.value)
+    }
+
+    def protected Constructor<?> findSuitableConstructor(Constructor<?>[] constructors) {
+        for (Constructor<?> constructor : constructors) {
+            if (constructor.parameterCount > 0)
+                return constructor
+        }
     }
 
     def protected stringify(Object object) {
@@ -77,22 +112,23 @@ class XtendBeanGenerator {
         }
     }
 
-    def protected List<Property> getBeanProperties(Object bean) {
+    def protected Map<String, Property> getBeanProperties(Object bean) {
         // could also implement using:
         //   * org.eclipse.xtext.xbase.lib.util.ReflectExtensions.get(Object, String)
         //   * com.google.common.truth.ReflectionUtil.getField(Class<?>, String)
         //   * org.codehaus.plexus.util.ReflectionUtils
         val propertyDescriptors = ReflectUtils.getBeanProperties(bean.class)
-        val properties = newArrayList()
+        val propertiesMap = newLinkedHashMap()
         for (propertyDescriptor : propertyDescriptors) {
-            if (propertyDescriptor.writeMethod != null || propertyDescriptor.propertyType.isAssignableFrom(List)) {
-                properties.add(new Property(propertyDescriptor.name,
-                               propertyDescriptor.readMethod.invoke(bean),
-                               getDefaultValue(propertyDescriptor.propertyType)
-                ))
-            }
+            propertiesMap.put(propertyDescriptor.name,
+                new Property(propertyDescriptor.name,
+                        propertyDescriptor.writeMethod != null,
+                        propertyDescriptor.propertyType,
+                        propertyDescriptor.readMethod.invoke(bean),
+                        getDefaultValue(propertyDescriptor.propertyType)
+            ))
         }
-        return properties
+        return propertiesMap
     }
 
     def protected Object getDefaultValue(Class<?> propertyClass) {
@@ -113,6 +149,8 @@ class XtendBeanGenerator {
     @FinalFieldsConstructor @Accessors(PUBLIC_GETTER)
     protected static class Property {
         final String name
+        final boolean isWriteable
+        final Class<?> type
         final Object value
         final Object defaultValue
     }
