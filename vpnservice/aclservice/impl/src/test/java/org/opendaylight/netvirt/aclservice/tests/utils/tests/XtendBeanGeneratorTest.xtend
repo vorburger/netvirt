@@ -6,6 +6,7 @@ import org.junit.Test
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator
 import java.math.BigInteger
+import java.util.List
 
 /**
  * Unit test for XtendBeanGenerator.
@@ -24,9 +25,14 @@ class XtendBeanGeneratorTest {
             anInteger = 123
             bigInteger = 456bi
             innerBean = new Bean() => [
-                name = "beanz"
+                name = "1beanz"
             ]
             name = "hello, world"
+            beanz = #[
+                new Bean() => [
+                    name = "beanz1"
+                ]
+            ]
         ]
 
         assertEquals('''
@@ -37,12 +43,20 @@ class XtendBeanGeneratorTest {
                 AShort = 123 as short
                 anInt = 123
                 anInteger = 123
+                beanz = #[
+                    new Bean() => [
+                        ALong = 0L
+                        AShort = 0 as short
+                        anInt = 0
+                        name = "beanz1"
+                    ]
+                ]
                 bigInteger = 456bi
                 innerBean = new Bean() => [
                     ALong = 0L
                     AShort = 0 as short
                     anInt = 0
-                    name = "beanz"
+                    name = "1beanz"
                 ]
                 name = "hello, world"
             ]'''.toString, g.getExpression(bean))
@@ -64,6 +78,7 @@ class XtendBeanGeneratorTest {
         BigInteger bigInteger
 
         Bean innerBean
+        @Accessors(PUBLIC_GETTER) List<Bean> beanz = newArrayList
     }
 
 }

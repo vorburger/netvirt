@@ -38,20 +38,23 @@ class XtendBeanGenerator {
         '''
         new «bean.class.simpleName»() => [
             «FOR field : getBeanFields(bean).entrySet»
-            «IF (field.value != null)»
-            «field.key» = «stringify(field.value)»
+            «val valueAsString = stringify(field.value)»
+            «IF (valueAsString != null)»
+            «field.key» = «valueAsString»
             «ENDIF»
             «ENDFOR»
         ]'''
     }
 
     def protected stringify(Object object) {
-        switch object {
+        if (object == null) {
+            null
+        } else switch object {
 //            Object[]  : '''#[ «FOR e : object»
 //                «getXtendExpression(e)»
 //            «ENDFOR»
 //                           ]'''
-            List<?>   : '''
+            List<?>   : if (object.isEmpty) null else '''
                         #[
                             «FOR e : object»
                             «getExpressionInternal(e)»
@@ -71,10 +74,12 @@ class XtendBeanGenerator {
         //   * org.eclipse.xtext.xbase.lib.util.ReflectExtensions.get(Object, String)
         //   * com.google.common.truth.ReflectionUtil.getField(Class<?>, String)
         //   * org.codehaus.plexus.util.ReflectionUtils
-        val properties = ReflectUtils.getBeanSetters(bean.class)
+        val properties = ReflectUtils.getBeanProperties(bean.class)
         val map = newLinkedHashMap()
         for (property : properties) {
-            map.put(property.name, property.readMethod.invoke(bean))
+            if (property.writeMethod != null || property.propertyType.isAssignableFrom(List)) {
+                map.put(property.name, property.readMethod.invoke(bean))
+            }
         }
         return map
     }
