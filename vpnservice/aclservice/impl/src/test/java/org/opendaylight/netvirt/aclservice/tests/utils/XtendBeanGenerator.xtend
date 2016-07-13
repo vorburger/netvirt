@@ -40,16 +40,17 @@ class XtendBeanGenerator {
 
     def protected CharSequence getNewBeanExpression(Object bean) {
         val properties = getBeanProperties(bean)
+        val constructorArguments = constructorArguments(bean, properties)
+        val filteredRemainingProperties = properties.filter[name, property |
+               (property.isWriteable || property.type.isAssignableFrom(List))
+               && (property.value != property.defaultValue)
+            ].values
         '''
-        new «bean.class.simpleName»«constructorArguments(bean, properties)» => [
-            «FOR property : properties.filter[name, property |
-               property.isWriteable || property.type.isAssignableFrom(List)
-            ].values»
-            «IF (property.value != property.defaultValue)»
+        new «bean.class.simpleName»«constructorArguments»«IF (!filteredRemainingProperties.empty)» => [«ENDIF»
+            «FOR property : filteredRemainingProperties»
             «property.name» = «stringify(property.value)»
-            «ENDIF»
             «ENDFOR»
-        ]'''
+        «IF (!filteredRemainingProperties.empty)»]«ENDIF»'''
     }
 
     def protected constructorArguments(Object bean, Map<String, Property> properties) {
