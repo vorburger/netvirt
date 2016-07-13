@@ -70,8 +70,6 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
     <dependency>
       <groupId>org.eclipse.xtend</groupId>
       <artifactId>org.eclipse.xtend.lib</artifactId>
-      <!-- TODO Remove when https://git.opendaylight.org/gerrit/#/c/41738/ is merged -->
-      <version>2.9.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -92,20 +90,6 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
       <plugin>
         <groupId>org.eclipse.xtend</groupId>
         <artifactId>xtend-maven-plugin</artifactId>
-        <!-- TODO Remove all of the following when https://git.opendaylight.org/gerrit/#/c/41738/ is merged -->
-        <version>2.9.2</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}/generated-sources/xtend/main</outputDirectory>
-              <testOutputDirectory>${project.build.directory}/generated-sources/xtend/test</testOutputDirectory>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
