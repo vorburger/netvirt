@@ -43,7 +43,7 @@ class XtendBeanGenerator {
         ]'''
     }
 
-    def stringify(Object object) {
+    def protected stringify(Object object) {
         switch object {
 //            Object[]  : '''#[ «FOR e : object»
 //                «getXtendExpression(e)»
@@ -62,7 +62,7 @@ class XtendBeanGenerator {
         }
     }
 
-    def Map<String, Object> getBeanFields(Object bean) {
+    def protected Map<String, Object> getBeanFields(Object bean) {
         // could also implement using:
         //   * org.eclipse.xtext.xbase.lib.util.ReflectExtensions.get(Object, String)
         //   * com.google.common.truth.ReflectionUtil.getField(Class<?>, String)

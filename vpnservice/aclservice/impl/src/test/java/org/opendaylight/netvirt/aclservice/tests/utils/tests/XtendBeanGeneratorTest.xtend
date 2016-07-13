@@ -1,7 +1,11 @@
 package org.opendaylight.netvirt.aclservice.tests.utils.tests
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertThat;
+
 import org.junit.Test
 import org.eclipse.xtend.lib.annotations.Accessors
+import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator
 
 /**
  * Unit test for XtendBeanGenerator.
@@ -10,14 +14,21 @@ import org.eclipse.xtend.lib.annotations.Accessors
  */
 class XtendBeanGeneratorTest {
 
+    val g = new XtendBeanGenerator()
+
     @Test def void simple() {
-        val b = new Bean
-        b.name = "hello, world"
+        val bean = new Bean
+        bean.name = "hello, world"
+        assertThat(g.getExpression(bean), containsString('''
+        new Bean() => [
+           name = "hello, world"
+        ]'''))
     }
 
-    @Accessors
-    private static class Bean {
-        String name
+
+    public static class Bean {
+        @Accessors String name
+        @Accessors(PUBLIC_GETTER) /* but no setter */ String onlyGetterString = "onlyGetterNoSetterString"
     }
 
 }
