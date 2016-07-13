@@ -37,9 +37,11 @@ class XtendBeanGenerator {
     def protected CharSequence getExpressionInternal(Object bean) {
         '''
         new «bean.class.simpleName»() => [
-           «FOR field : getBeanFields(bean).entrySet»
-           «field.key» = «stringify(field.value)»
-           «ENDFOR»
+            «FOR field : getBeanFields(bean).entrySet»
+            «IF (field.value != null)»
+            «field.key» = «stringify(field.value)»
+            «ENDIF»
+            «ENDFOR»
         ]'''
     }
 
@@ -56,9 +58,11 @@ class XtendBeanGenerator {
                             «ENDFOR»
                         ]'''
             String    : '''"«object»"'''
+            Integer   : '''«object»'''
+            Long      : '''«object»L'''
             Short     : '''«object» as short'''
             BigInteger: '''«object»bi'''
-            default   : '''«object»'''
+            default   : '''«getExpressionInternal(object)»'''
         }
     }
 
@@ -67,11 +71,10 @@ class XtendBeanGenerator {
         //   * org.eclipse.xtext.xbase.lib.util.ReflectExtensions.get(Object, String)
         //   * com.google.common.truth.ReflectionUtil.getField(Class<?>, String)
         //   * org.codehaus.plexus.util.ReflectionUtils
-        val properties = ReflectUtils.getBeanGetters(bean.class)
+        val properties = ReflectUtils.getBeanSetters(bean.class)
         val map = newLinkedHashMap()
         for (property : properties) {
-            if (property.writeMethod != null)
-              map.put(property.name, property.readMethod.invoke(bean))
+            map.put(property.name, property.readMethod.invoke(bean))
         }
         return map
     }
