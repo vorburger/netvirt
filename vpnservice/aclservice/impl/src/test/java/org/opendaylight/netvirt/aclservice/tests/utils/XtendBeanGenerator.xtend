@@ -29,11 +29,6 @@ import org.eclipse.xtext.xbase.lib.Functions.Function0
  */
 class XtendBeanGenerator {
 
-    // Implementation here is a mix supporting both Constructor as well
-    // as Builder based object creation.  If we see in practice that we'll
-    // end up only using the Builder based one, then some code re. constructors
-    // could be removed here in order to simplify this class a bit.
-
     val ReflectExtensions xtendReflectExtensions = new ReflectExtensions
 
     def void print(Object bean) {
@@ -157,6 +152,7 @@ class XtendBeanGenerator {
             Float     : '''«object»f'''
             Short     : '''«object» as short'''
             BigInteger: '''«object»bi'''
+            Enum      : '''«object.name»'''
             default   : '''«getNewBeanExpression(object)»'''
         }
     }

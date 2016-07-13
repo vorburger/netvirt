@@ -85,6 +85,10 @@ class XtendBeanGeneratorBaseTest {
         assertEquals("new ExplosiveBean\n", g.getExpression(new ExplosiveBean))
     }
 
+    @Test def void testEnum() {
+        assertEquals("a", g.getExpression(TestEnum.a))
+    }
+
     def private void assertThatEndsWith(String string, String endsWith) {
         assertTrue("'''" + string + "''' expected to endWith '''" + endsWith + "'''", string.endsWith(endsWith));
     }
@@ -95,4 +99,6 @@ class XtendBeanGeneratorBaseTest {
             throw new IllegalStateException
         }
     }
+
+    public static enum TestEnum { a, b, c }
 }
