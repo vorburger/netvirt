@@ -9,6 +9,7 @@ import java.lang.reflect.Constructor
 import java.util.Map
 import java.lang.reflect.Parameter
 import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator.Property
+import java.util.Set
 
 /**
  * Magic. pure. Magic.
@@ -25,8 +26,6 @@ import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator.Proper
  * @author Michael Vorburger
  */
 class XtendBeanGenerator {
-
-    // TODO Support Builder - automatically, just check CP for *Builder
 
     def void print(Object bean) {
         System.out.println(getExpression(bean))
@@ -57,7 +56,7 @@ class XtendBeanGenerator {
         val constructors = bean.class.constructors
         if (constructors.isEmpty) ''''''
         else {
-            val constructor = findSuitableConstructor(constructors)
+            val constructor = findSuitableConstructor(constructors, properties.keySet)
             if (constructor == null) ''''''
             else {
                 val parameters = constructor.parameters
@@ -66,12 +65,30 @@ class XtendBeanGenerator {
         }
     }
 
+    def protected Constructor<?> findSuitableConstructor(Constructor<?>[] constructors, Set<String> propertyNames) {
+        if (constructors.isEmpty) null else constructors.get(0)
+/* This original idea, to automagically find the required constructor,
+ * isn't quite fleshed out & finished, and doesn't really work yet;
+ * current implementation addresses this via Builder support.
+ * Later, maybe, complete this:
+
+        val possibleConstructors = newArrayList
+        for (Constructor<?> constructor : constructors) {
+            var suitableConstructor = true
+            for (parameter : constructor.parameters) {
+                if (!propertyNames.contains(getParameterName(parameter))) {
+                    suitableConstructor = false
+                }
+            }
+            if (suitableConstructor)
+                possibleConstructors.add(constructor)
+        }
+        if (possibleConstructors.isEmpty) null else possibleConstructors.get(0)
+*/
+    }
+
     def protected getConstructorParameterValue(Parameter parameter, Map<String, Property> properties) {
-        if (!parameter.isNamePresent)
-            // https://docs.oracle.com/javase/tutorial/reflect/member/methodparameterreflection.html
-            throw new IllegalStateException(
-                "Needs javac -parameters; or, in Eclipse: 'Store information about method parameters (usable via reflection)' in Window -> Preferences -> Java -> Compiler, for: " + parameter.declaringExecutable);
-        val constructorParameterName = parameter.name
+        val constructorParameterName = getParameterName(parameter)
         val value = properties.get(constructorParameterName)
         if (value == null)
             throw new IllegalStateException(
@@ -81,11 +98,13 @@ class XtendBeanGenerator {
         return stringify(value.value)
     }
 
-    def protected Constructor<?> findSuitableConstructor(Constructor<?>[] constructors) {
-        for (Constructor<?> constructor : constructors) {
-            if (constructor.parameterCount > 0)
-                return constructor
-        }
+    def getParameterName(Parameter parameter) {
+        if (!parameter.isNamePresent)
+            // https://docs.oracle.com/javase/tutorial/reflect/member/methodparameterreflection.html
+            throw new IllegalStateException(
+                "Needs javac -parameters; or, in Eclipse: 'Store information about method parameters (usable via "
+                + "reflection)' in Window -> Preferences -> Java -> Compiler, for: " + parameter.declaringExecutable);
+        parameter.name
     }
 
     def protected CharSequence stringify(Object object) {
