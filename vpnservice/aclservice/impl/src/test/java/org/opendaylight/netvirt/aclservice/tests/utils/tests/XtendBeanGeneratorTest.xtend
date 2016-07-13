@@ -19,6 +19,16 @@ class XtendBeanGeneratorTest {
 
     val g = new XtendBeanGenerator()
 
+    @Test def void simpleBean() {
+        val bean = new Bean => [
+            name = "hello, world"
+        ]
+        assertEquals('''
+            new Bean => [
+                name = "hello, world"
+            ]'''.toString, g.getExpression(bean))
+    }
+
     @Test def void complexBean() {
         val bean = new Bean => [
             ALongObject = 123L

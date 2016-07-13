@@ -8,6 +8,8 @@ import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorT
 import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorTest.BeanWithMultiConstructor
 import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorTest.BeanWithMultiConstructorBuilder
 import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator
+import org.opendaylight.genius.mdsalutil.ActionInfoBuilder
+import org.opendaylight.genius.mdsalutil.ActionInfo
 
 /**
  * Unit test for basic XtendBeanGenerator.
@@ -69,13 +71,28 @@ class XtendBeanGeneratorBaseTest {
             g.getBuilderClass(new BeanWithMultiConstructor(123)))
     }
 
+    @Test def void findAdjacentBuilderClass2() {
+        assertEquals(ActionInfoBuilder,
+            g.getBuilderClass(new ActionInfo(null, null as String[])))
+    }
+
     @Test def void emptyComplexBean() {
         assertEquals('''new Bean
             '''.toString, g.getExpression(new Bean))
+    }
+
+    @Test def void neverCallOnlyGettersIfThereIsNoSetter() {
+        assertEquals("new ExplosiveBean\n", g.getExpression(new ExplosiveBean))
     }
 
     def private void assertThatEndsWith(String string, String endsWith) {
         assertTrue("'''" + string + "''' expected to endWith '''" + endsWith + "'''", string.endsWith(endsWith));
     }
 
+    public static class ExplosiveBean {
+        String onlyGetter
+        def String getOnlyGetter() {
+            throw new IllegalStateException
+        }
+    }
 }

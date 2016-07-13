@@ -20,7 +20,7 @@ class FlowEntryObjects {
 
     static def flow1() {
         new FlowEntity(new BigInteger("123")) => [
-            tableId = 22 as short // TODO remove as short and BigInteger when https://git.opendaylight.org/gerrit/#/c/41519/ is merged
+            tableId = 40 as short // TODO remove as short and BigInteger when https://git.opendaylight.org/gerrit/#/c/41519/ is merged
             flowId = "Egress_DHCP_Client_v4123_0D:AA:D8:42:30:F3__Permit_"
             flowName = "ACL"
             priority = 61010
@@ -37,7 +37,7 @@ class FlowEntryObjects {
                 new InstructionInfo(apply_actions, #[
                     new ActionInfo(nx_conntrack, #["1", "0", "0", "255"], 2)
                 ]),
-                new InstructionInfo(InstructionType.goto_table, #[23])
+                new InstructionInfo(InstructionType.goto_table, #[41])
             ]
             strictFlag = false
             sendFlowRemFlag = false

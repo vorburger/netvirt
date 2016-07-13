@@ -102,7 +102,7 @@ public class NetvirtACLDataBrokerTest extends AbstractDataBrokerTest {
         assertThat(mdsalApiManager.getFlows(), hasSize(10));
         // TODO Make FlowEntry have proper equals (and hashCode) and remove toString.. see compareFlowEntryWithEquals in NetvirtACLUnitTest
         assertEquals(FlowEntryObjects.flow1().toString(), mdsalApiManager.getFlows().get(0).toString());
-        new XtendBeanGenerator().print(mdsalApiManager.getFlows().get(0));
+        new XtendBeanGenerator().print(mdsalApiManager.getFlows());
         // TODO remove assertEquals above, and use only assertThat, once equals works...
         // TODO DOC Hamcrest http://www.baeldung.com/hamcrest-collections-arrays, http://www.vogella.com/tutorials/Hamcrest/article.html
         assertThat(mdsalApiManager.getFlows(), contains(FlowEntryObjects.flow1()));
