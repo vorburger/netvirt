@@ -26,7 +26,6 @@ import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator.Proper
  */
 class XtendBeanGenerator {
 
-    // TODO Detect Constructor..
     // TODO Support Builder - automatically, just check CP for *Builder
 
     def void print(Object bean) {
@@ -39,7 +38,7 @@ class XtendBeanGenerator {
         «stringify(bean)»'''
     }
 
-    def protected CharSequence getExpressionInternal(Object bean) {
+    def protected CharSequence getNewBeanExpression(Object bean) {
         val properties = getBeanProperties(bean)
         '''
         new «bean.class.simpleName»«constructorArguments(bean, properties)» => [
@@ -69,11 +68,14 @@ class XtendBeanGenerator {
     def protected getConstructorParameterValue(Parameter parameter, Map<String, Property> properties) {
         if (!parameter.isNamePresent)
             // https://docs.oracle.com/javase/tutorial/reflect/member/methodparameterreflection.html
-            throw new IllegalStateException("Needs javac -parameters; or, in Eclipse: 'Store information about method parameters (usable via reflection)' in Window -> Preferences -> Java -> Compiler");
+            throw new IllegalStateException(
+                "Needs javac -parameters; or, in Eclipse: 'Store information about method parameters (usable via reflection)' in Window -> Preferences -> Java -> Compiler, for: " + parameter.declaringExecutable);
         val constructorParameterName = parameter.name
         val value = properties.get(constructorParameterName)
         if (value == null)
-            throw new IllegalStateException("Constructor parameter '" + constructorParameterName + "' not found in bean's properties: " + properties.keySet)
+            throw new IllegalStateException(
+                "Constructor parameter '" + constructorParameterName + "' not found in " +
+                    parameter.declaringExecutable + " bean's properties: " + properties.keySet)
         properties.remove(constructorParameterName)
         return stringify(value.value)
     }
@@ -85,17 +87,19 @@ class XtendBeanGenerator {
         }
     }
 
-    def protected stringify(Object object) {
+    def protected CharSequence stringify(Object object) {
         switch object {
             case null : "null"
-//            Object[]  : '''#[ «FOR e : object»
-//                «getXtendExpression(e)»
-//            «ENDFOR»
-//                           ]'''
+            Object[]  : '''
+                        #[
+                            «FOR e : object»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
             List<?>   : '''
                         #[
                             «FOR e : object»
-                            «getExpressionInternal(e)»
+                            «stringify(e)»
                             «ENDFOR»
                         ]'''
             String    : '''"«object»"'''
@@ -108,7 +112,7 @@ class XtendBeanGenerator {
             Float     : '''«object»f'''
             Short     : '''«object» as short'''
             BigInteger: '''«object»bi'''
-            default   : '''«getExpressionInternal(object)»'''
+            default   : '''«getNewBeanExpression(object)»'''
         }
     }
 
