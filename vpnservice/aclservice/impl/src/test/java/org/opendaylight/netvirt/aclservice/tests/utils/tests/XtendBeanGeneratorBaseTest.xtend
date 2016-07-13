@@ -19,6 +19,7 @@ import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorT
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertTrue
+import org.junit.Ignore
 
 /**
  * Unit test for basic XtendBeanGenerator.
@@ -112,6 +113,80 @@ class XtendBeanGeneratorBaseTest {
             ]'''.toString, g.getExpression(b))
     }
 
+    @Test def void arrayBean() {
+        val b = new ArrayBean => [
+            strings = #[ "hi", "bhai" ]
+        ]
+        assertEquals(
+            '''
+            new ArrayBean => [
+                strings = #[
+                    "hi",
+                    "bhai"
+                ]
+            ]'''.toString, g.getExpression(b))
+    }
+
+    @Test def void nullArray() {
+        val b = new ArrayBean => [
+            strings = null
+        ]
+        assertEquals("new ArrayBean\n", g.getExpression(b))
+    }
+
+    @Test def void primitiveArrayBean() {
+        val b = new PrimitiveArrayBean => [
+            ints = #[ 123, 456 ]
+        ]
+        assertEquals(
+            '''
+            new PrimitiveArrayBean => [
+                ints = #[
+                    123,
+                    456
+                ]
+            ]'''.toString, g.getExpression(b))
+    }
+
+    @Test def void nullPrimitiveArrayBean() {
+        val b = new PrimitiveArrayBean => [
+            ints = null
+        ]
+        assertEquals("new PrimitiveArrayBean\n", g.getExpression(b))
+    }
+
+    @Test def void arrayBeanList() {
+        val b = new ArrayBeanList => [
+            strings = #[ "hi", "bhai" ]
+            longs = #[ 12, 34 ]
+        ]
+        assertEquals(
+            '''
+            (new ArrayBeanListBuilder => [
+                longs += #[
+                    12L,
+                    34L
+                ]
+                strings += #[
+                    "hi",
+                    "bhai"
+                ]
+            ]).build()'''.toString, g.getExpression(b))
+    }
+
+    @Test def void nullArrayBeanList() {
+        val b = new ArrayBeanList => [
+            strings = null
+        ]
+        assertEquals("new ArrayBeanBuilder\n", g.getExpression(b))
+    }
+
+    @Ignore // Not yet implemented
+    @Test def void emptyArray() {
+        val b = new ArrayBean
+        assertEquals("new ArrayBean\n", g.getExpression(b))
+    }
+
     def private void assertThatEndsWith(String string, String endsWith) {
         assertTrue("'''" + string + "''' expected to endWith '''" + endsWith + "'''", string.endsWith(endsWith));
     }
@@ -121,6 +196,35 @@ class XtendBeanGeneratorBaseTest {
     public static class ListBean {
         @Accessors(PUBLIC_GETTER) /* but no setter */
         List<String> strings = newArrayList
+    }
+
+    @Accessors
+    public static class ArrayBean {
+        String[] strings = newArrayList
+    }
+
+    @Accessors
+    public static class PrimitiveArrayBean {
+        int[] ints = newArrayList
+    }
+
+    @Accessors(PUBLIC_GETTER) // with Builder, below!
+    public static class ArrayBeanList {
+        String[] strings
+        long[] longs
+    }
+
+    @Accessors
+    public static class ArrayBeanListBuilder {
+        List<String> strings = newArrayList
+        List<Long> longs = newArrayList
+
+        def public build() {
+            new ArrayBeanList() => [
+                it.strings = this.strings
+                it.longs = this.longs
+            ]
+        }
     }
 
     public static class ExplosiveBean {

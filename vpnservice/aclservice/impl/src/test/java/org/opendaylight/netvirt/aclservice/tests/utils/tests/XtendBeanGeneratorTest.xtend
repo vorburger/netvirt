@@ -88,7 +88,7 @@ class XtendBeanGeneratorTest {
     @Test def void beanWithBuilder() {
         val BeanWithBuilder bean = (new BeanWithBuilderBuilder => [
             name = "hoho"
-        ]).build()
+        ]).build
         assertEquals('''
             (new BeanWithBuilderBuilder => [
                 name = "hoho"

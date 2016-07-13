@@ -58,7 +58,7 @@ class XtendBeanGenerator {
     }
 
     def isList(Property property) {
-        property.type.isAssignableFrom(List)
+        property.type.isAssignableFrom(List) // NOT || property.type.isArray
     }
 
     def protected Class<?> getBuilderClass(Object bean) {
@@ -134,12 +134,7 @@ class XtendBeanGenerator {
     def protected CharSequence stringify(Object object) {
         switch object {
             case null : "null"
-            Object[]  : '''
-                        #[
-                            «FOR e : object SEPARATOR ','»
-                            «stringify(e)»
-                            «ENDFOR»
-                        ]'''
+            case object.class.isArray : stringifyArray(object)
             List<?>   : '''
                         #[
                             «FOR e : object SEPARATOR ','»
@@ -158,6 +153,65 @@ class XtendBeanGenerator {
             BigInteger: '''«object»bi'''
             Enum<?>   : '''«object.declaringClass.simpleName».«object.name»'''
             default   : '''«getNewBeanExpression(object)»'''
+        }
+    }
+
+    def protected CharSequence stringifyArray(Object array) {
+        switch array {
+            byte[]    : '''
+                        #[
+                            «FOR e : array SEPARATOR ','»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
+            boolean[] : '''
+                        #[
+                            «FOR e : array SEPARATOR ','»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
+            char[] : '''
+                        #[
+                            «FOR e : array SEPARATOR ','»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
+            double[] : '''
+                        #[
+                            «FOR e : array SEPARATOR ','»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
+            float[] : '''
+                        #[
+                            «FOR e : array SEPARATOR ','»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
+            int[]     : '''
+                        #[
+                            «FOR e : array SEPARATOR ','»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
+            long[]    : '''
+                        #[
+                            «FOR e : array SEPARATOR ','»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
+            short[]    : '''
+                        #[
+                            «FOR e : array SEPARATOR ','»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
+            Object[]  : '''
+                        #[
+                            «FOR e : array SEPARATOR ','»
+                            «stringify(e)»
+                            «ENDFOR»
+                        ]'''
         }
     }
 
