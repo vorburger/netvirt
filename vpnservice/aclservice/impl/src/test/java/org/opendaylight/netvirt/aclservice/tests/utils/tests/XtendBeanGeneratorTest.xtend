@@ -60,7 +60,7 @@ class XtendBeanGeneratorTest {
                 AShort = 123 as short
                 anInt = 123
                 anInteger = 123
-                beanz = #[
+                beanz += #[
                     new Bean => [
                         name = "beanz1"
                     ]

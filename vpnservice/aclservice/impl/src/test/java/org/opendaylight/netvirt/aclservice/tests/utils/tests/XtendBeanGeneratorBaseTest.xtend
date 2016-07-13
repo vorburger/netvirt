@@ -7,16 +7,18 @@
  */
 package org.opendaylight.netvirt.aclservice.tests.utils.tests
 
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertTrue
-
+import java.util.List
+import org.eclipse.xtend.lib.annotations.Accessors
 import org.junit.Test
+import org.opendaylight.genius.mdsalutil.ActionInfo
+import org.opendaylight.genius.mdsalutil.ActionInfoBuilder
+import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator
 import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorTest.Bean
 import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorTest.BeanWithMultiConstructor
 import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorTest.BeanWithMultiConstructorBuilder
-import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator
-import org.opendaylight.genius.mdsalutil.ActionInfoBuilder
-import org.opendaylight.genius.mdsalutil.ActionInfo
+
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertTrue
 
 /**
  * Unit test for basic XtendBeanGenerator.
@@ -96,8 +98,29 @@ class XtendBeanGeneratorBaseTest {
         assertEquals("TestEnum.a", g.getExpression(TestEnum.a))
     }
 
+    @Test def void listBean() {
+        val b = new ListBean => [
+            strings += #[ "hi", "bhai" ]
+        ]
+        assertEquals(
+            '''
+            new ListBean => [
+                strings += #[
+                    "hi",
+                    "bhai"
+                ]
+            ]'''.toString, g.getExpression(b))
+    }
+
     def private void assertThatEndsWith(String string, String endsWith) {
         assertTrue("'''" + string + "''' expected to endWith '''" + endsWith + "'''", string.endsWith(endsWith));
+    }
+
+    public static enum TestEnum { a, b, c }
+
+    public static class ListBean {
+        @Accessors(PUBLIC_GETTER) /* but no setter */
+        List<String> strings = newArrayList
     }
 
     public static class ExplosiveBean {
@@ -107,5 +130,4 @@ class XtendBeanGeneratorBaseTest {
         }
     }
 
-    public static enum TestEnum { a, b, c }
 }

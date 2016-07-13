@@ -46,15 +46,19 @@ class XtendBeanGenerator {
         val properties = getBeanProperties(bean, builderClass)
         val constructorArguments = constructorArguments(bean, builderClass, properties)
         val filteredRemainingProperties = properties.filter[name, property |
-               (property.isWriteable || property.type.isAssignableFrom(List))
+               (property.isWriteable || property.isList)
                && (property.valueFunction.apply != property.defaultValue)
             ].values
         '''
-        «IF (isUsingBuilder)»(«ENDIF»new «builderClass.simpleName»«constructorArguments»«IF (!filteredRemainingProperties.empty)» => [«ENDIF»
+        «IF isUsingBuilder»(«ENDIF»new «builderClass.simpleName»«constructorArguments»«IF !filteredRemainingProperties.empty» => [«ENDIF»
             «FOR property : filteredRemainingProperties»
-            «property.name» = «stringify(property.valueFunction.apply)»
+            «property.name» «IF property.isList»+=«ELSE»=«ENDIF» «stringify(property.valueFunction.apply)»
             «ENDFOR»
-        «IF (!filteredRemainingProperties.empty)»]«ENDIF»«IF (isUsingBuilder)»).build()«ENDIF»'''
+        «IF !filteredRemainingProperties.empty»]«ENDIF»«IF isUsingBuilder»).build()«ENDIF»'''
+    }
+
+    def isList(Property property) {
+        property.type.isAssignableFrom(List)
     }
 
     def protected Class<?> getBuilderClass(Object bean) {
