@@ -2,7 +2,8 @@ package org.opendaylight.netvirt.aclservice.tests.utils
 
 import java.math.BigInteger
 import java.util.List
-import java.util.Map
+import org.eclipse.xtend.lib.annotations.Accessors
+import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.mockito.cglib.core.ReflectUtils
 
 /**
@@ -36,25 +37,27 @@ class XtendBeanGenerator {
 
     def protected CharSequence getExpressionInternal(Object bean) {
         '''
-        new «bean.class.simpleName»() => [
-            «FOR field : getBeanFields(bean).entrySet»
-            «val valueAsString = stringify(field.value)»
-            «IF (valueAsString != null)»
-            «field.key» = «valueAsString»
+        new «bean.class.simpleName»«constructorArguments(bean)» => [
+            «FOR property : getBeanProperties(bean)»
+            «IF (property.value != property.defaultValue)»
+            «property.name» = «stringify(property.value)»
             «ENDIF»
             «ENDFOR»
         ]'''
     }
 
+    def protected constructorArguments(Object bean) {
+        ''''''
+    }
+
     def protected stringify(Object object) {
-        if (object == null) {
-            null
-        } else switch object {
+        switch object {
+            case null : "null"
 //            Object[]  : '''#[ «FOR e : object»
 //                «getXtendExpression(e)»
 //            «ENDFOR»
 //                           ]'''
-            List<?>   : if (object.isEmpty) null else '''
+            List<?>   : '''
                         #[
                             «FOR e : object»
                             «getExpressionInternal(e)»
@@ -63,25 +66,54 @@ class XtendBeanGenerator {
             String    : '''"«object»"'''
             Integer   : '''«object»'''
             Long      : '''«object»L'''
+            Boolean   : '''«object»'''
+            Byte      : '''«object»'''
+            Character : '''«"'"»«object»«"'"»'''
+            Double    : '''«object»d'''
+            Float     : '''«object»f'''
             Short     : '''«object» as short'''
             BigInteger: '''«object»bi'''
             default   : '''«getExpressionInternal(object)»'''
         }
     }
 
-    def protected Map<String, Object> getBeanFields(Object bean) {
+    def protected List<Property> getBeanProperties(Object bean) {
         // could also implement using:
         //   * org.eclipse.xtext.xbase.lib.util.ReflectExtensions.get(Object, String)
         //   * com.google.common.truth.ReflectionUtil.getField(Class<?>, String)
         //   * org.codehaus.plexus.util.ReflectionUtils
-        val properties = ReflectUtils.getBeanProperties(bean.class)
-        val map = newLinkedHashMap()
-        for (property : properties) {
-            if (property.writeMethod != null || property.propertyType.isAssignableFrom(List)) {
-                map.put(property.name, property.readMethod.invoke(bean))
+        val propertyDescriptors = ReflectUtils.getBeanProperties(bean.class)
+        val properties = newArrayList()
+        for (propertyDescriptor : propertyDescriptors) {
+            if (propertyDescriptor.writeMethod != null || propertyDescriptor.propertyType.isAssignableFrom(List)) {
+                properties.add(new Property(propertyDescriptor.name,
+                               propertyDescriptor.readMethod.invoke(bean),
+                               getDefaultValue(propertyDescriptor.propertyType)
+                ))
             }
         }
-        return map
+        return properties
     }
 
+    def protected Object getDefaultValue(Class<?> propertyClass) {
+        switch propertyClass {
+            case Byte.TYPE: 0 as byte
+            case Boolean.TYPE: false
+            case Character.TYPE: new Character('\u0000')
+            case Double.TYPE: 0.0d
+            case Float.TYPE: 0.0f
+            case Integer.TYPE: 0
+            case List: #[]
+            case Long.TYPE: 0L
+            case Short.TYPE: 0 as short
+            default: null
+        }
+    }
+
+    @FinalFieldsConstructor @Accessors(PUBLIC_GETTER)
+    protected static class Property {
+        final String name
+        final Object value
+        final Object defaultValue
+    }
 }
