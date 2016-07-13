@@ -132,13 +132,13 @@ class XtendBeanGenerator {
             case null : "null"
             Object[]  : '''
                         #[
-                            «FOR e : object»
+                            «FOR e : object SEPARATOR ','»
                             «stringify(e)»
                             «ENDFOR»
                         ]'''
             List<?>   : '''
                         #[
-                            «FOR e : object»
+                            «FOR e : object SEPARATOR ','»
                             «stringify(e)»
                             «ENDFOR»
                         ]'''

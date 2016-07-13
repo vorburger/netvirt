@@ -65,7 +65,7 @@ class XtendBeanGeneratorBaseTest {
     }
 
     @Test def void list() {
-        assertThatEndsWith(g.getExpression(#["hi"]), "#[\n    \"hi\"\n]")
+        assertThatEndsWith(g.getExpression(#["hi", "ho"]), "#[\n    \"hi\",\n    \"ho\"\n]")
     }
 
     @Test def void findEnclosingBuilderClass() {
