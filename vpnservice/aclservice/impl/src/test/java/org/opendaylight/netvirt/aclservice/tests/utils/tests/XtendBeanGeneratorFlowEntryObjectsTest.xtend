@@ -21,6 +21,7 @@ import org.opendaylight.netvirt.aclservice.tests.FlowEntryObjects
 import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator
 
 import static org.junit.Assert.assertEquals
+import org.opendaylight.genius.mdsalutil.ActionInfo
 
 /**
  * Tests XtendBeanGenerator through FlowEntryObjects.
@@ -29,6 +30,22 @@ import static org.junit.Assert.assertEquals
  * @author Michael Vorburger
  */
 class XtendBeanGeneratorFlowEntryObjectsTest {
+
+    @Test def void actionInfoActionKeyLoss() {
+        val actionInfo = new ActionInfo(ActionType.nx_conntrack, #["1", "0", "0", "255"], 2)
+        new XtendBeanGenerator().print(actionInfo)
+        val actionInfo2 = (new ActionInfoBuilder => [
+            actionKey = 2
+            actionType = ActionType.nx_conntrack
+            actionValues = #[
+                "1",
+                "0",
+                "0",
+                "255"
+            ]
+        ]).build()
+        assertEquals(actionInfo, actionInfo2)
+    }
 
     @Test def void expressionString() {
         assertEquals(
@@ -97,8 +114,7 @@ class XtendBeanGeneratorFlowEntryObjectsTest {
             ]'''.toString, new XtendBeanGenerator().getExpression(FlowEntryObjects::flow1()))
     }
 
-    @Test def void expression() {
-        assertEquals(
+    val FlowEntity flow1 =
             new FlowEntity(123bi) => [
                 cookie = 110100480bi
                 flowId = "Egress_DHCP_Client_v4123_0D:AA:D8:42:30:F3__Permit_"
@@ -161,7 +177,15 @@ class XtendBeanGeneratorFlowEntryObjectsTest {
                 priority = 61010
                 tableId = 40 as short
             ]
-        , FlowEntryObjects::flow1())
+
+    @Test def void expressionEquals() {
+        assertEquals(flow1, FlowEntryObjects::flow1())
+    }
+
+    @Test def void expressionXtendBeanGeneratorStringEquals() {
+        assertEquals(new XtendBeanGenerator().getExpression(flow1),
+            new XtendBeanGenerator().getExpression(FlowEntryObjects::flow1())
+        )
     }
 
 }
