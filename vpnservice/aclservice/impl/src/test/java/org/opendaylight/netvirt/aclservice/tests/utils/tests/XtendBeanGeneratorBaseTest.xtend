@@ -127,11 +127,16 @@ class XtendBeanGeneratorBaseTest {
             ]'''.toString, g.getExpression(b))
     }
 
+    @Test def void defaultArray() {
+        val b = new ArrayBean
+        assertEquals("new ArrayBean\n", g.getExpression(b))
+    }
+
     @Test def void nullArray() {
         val b = new ArrayBean => [
             strings = null
         ]
-        assertEquals("new ArrayBean\n", g.getExpression(b))
+        assertEquals("new ArrayBean => [\n    strings = null\n]", g.getExpression(b))
     }
 
     @Test def void primitiveArrayBean() {
@@ -148,11 +153,16 @@ class XtendBeanGeneratorBaseTest {
             ]'''.toString, g.getExpression(b))
     }
 
+    @Test def void defaultPrimitiveArrayBean() {
+        val b = new PrimitiveArrayBean
+        assertEquals("new PrimitiveArrayBean\n", g.getExpression(b))
+    }
+
     @Test def void nullPrimitiveArrayBean() {
         val b = new PrimitiveArrayBean => [
             ints = null
         ]
-        assertEquals("new PrimitiveArrayBean\n", g.getExpression(b))
+        assertEquals("new PrimitiveArrayBean => [\n    ints = null\n]", g.getExpression(b))
     }
 
     @Test def void arrayBeanList() {
@@ -183,8 +193,7 @@ class XtendBeanGeneratorBaseTest {
         assertEquals("new ArrayBeanBuilder\n", g.getExpression(b))
     }
 
-    @Ignore // Not yet implemented
-    @Test def void emptyArray() {
+    @Test def void emptyArrayToCheckCorrectDefaulting() {
         val b = new ArrayBean
         assertEquals("new ArrayBean\n", g.getExpression(b))
     }

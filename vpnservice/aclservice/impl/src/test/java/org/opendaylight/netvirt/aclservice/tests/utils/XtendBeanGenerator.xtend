@@ -1,18 +1,21 @@
 package org.opendaylight.netvirt.aclservice.tests.utils
 
+import java.beans.PropertyDescriptor
+import java.lang.reflect.Constructor
+import java.lang.reflect.Parameter
 import java.math.BigInteger
+import java.util.Arrays
 import java.util.List
+import java.util.Map
+import java.util.Set
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
-import org.mockito.cglib.core.ReflectUtils
-import java.lang.reflect.Constructor
-import java.util.Map
-import java.lang.reflect.Parameter
-import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator.Property
-import java.util.Set
-import org.eclipse.xtext.xbase.lib.util.ReflectExtensions
 import org.eclipse.xtext.xbase.lib.Functions.Function0
-import java.util.Arrays
+import org.eclipse.xtext.xbase.lib.util.ReflectExtensions
+import org.mockito.cglib.core.ReflectUtils
+import org.objenesis.Objenesis
+import org.objenesis.ObjenesisStd
+import org.objenesis.instantiator.ObjectInstantiator
 
 /**
  * Magic. pure. Magic.
@@ -36,6 +39,7 @@ import java.util.Arrays
  */
 class XtendBeanGenerator {
 
+    val Objenesis objenesis = new ObjenesisStd
     val ReflectExtensions xtendReflectExtensions = new ReflectExtensions
 
     def void print(Object bean) {
@@ -50,13 +54,7 @@ class XtendBeanGenerator {
     def protected CharSequence getNewBeanExpression(Object bean) {
         val builderClass = getBuilderClass(bean)
         val isUsingBuilder = !builderClass.equals(bean.class)
-        val properties = getBeanProperties(bean, builderClass).filter[name, property |
-            try {
-                property.valueFunction.apply != property.defaultValue
-            } catch (Throwable t) {
-                false
-            }
-        ]
+        val properties = getBeanProperties(bean, builderClass).filter[name, property | !property.hasDefaultValue ]
         val constructorArguments = constructorArguments(bean, builderClass, properties)
         val filteredRemainingProperties = properties.filter[name, property |
             (property.isWriteable || property.isList)].values
@@ -234,32 +232,41 @@ class XtendBeanGenerator {
         //   * org.eclipse.xtext.xbase.lib.util.ReflectExtensions.get(Object, String)
         //   * com.google.common.truth.ReflectionUtil.getField(Class<?>, String)
         //   * org.codehaus.plexus.util.ReflectionUtils
+        val defaultValuesBean = newEmptyBeanForDefaultValues(builderClass)
         val propertyDescriptors = ReflectUtils.getBeanProperties(builderClass)
         val propertiesMap = newLinkedHashMap()
         for (propertyDescriptor : propertyDescriptors) {
-            propertiesMap.put(propertyDescriptor.name, new Property(
-                propertyDescriptor.name,
-                propertyDescriptor.writeMethod != null,
-                propertyDescriptor.propertyType,
-                [ | xtendReflectExtensions.invoke(bean, propertyDescriptor.readMethod.name)],
-                getDefaultValue(propertyDescriptor.propertyType)
-            ))
+            if (isPropertyConsidered(propertyDescriptor))
+                propertiesMap.put(propertyDescriptor.name, new Property(
+                    propertyDescriptor.name,
+                    propertyDescriptor.writeMethod != null,
+                    propertyDescriptor.propertyType,
+                    [ | xtendReflectExtensions.invoke(bean, propertyDescriptor.readMethod.name)],
+                    if (defaultValuesBean != null)
+                        try {
+                            xtendReflectExtensions.invoke(defaultValuesBean, propertyDescriptor.readMethod.name)
+                        } catch (Throwable t) {
+                            null
+                        }
+                    else
+                        null
+                ))
         }
         return propertiesMap
     }
 
-    def protected Object getDefaultValue(Class<?> propertyClass) {
-        switch propertyClass {
-            case Byte.TYPE: 0 as byte
-            case Boolean.TYPE: false
-            case Character.TYPE: new Character('\u0000')
-            case Double.TYPE: 0.0d
-            case Float.TYPE: 0.0f
-            case Integer.TYPE: 0
-            case List: #[]
-            case Long.TYPE: 0L
-            case Short.TYPE: 0 as short
-            default: null
+    def boolean isPropertyConsidered(PropertyDescriptor propertyDescriptor) {
+        true
+    }
+
+    def newEmptyBeanForDefaultValues(Class<?> builderClass) {
+        // http://objenesis.org
+        // val ObjectInstantiator<?> builderClassInstantiator = objenesis.getInstantiatorOf(builderClass)
+        // builderClassInstantiator.newInstance
+        try {
+            builderClass.newInstance
+        } catch (InstantiationException e) {
+            null
         }
     }
 
@@ -270,5 +277,34 @@ class XtendBeanGenerator {
         final Class<?> type
         final Function0<Object> valueFunction
         final Object defaultValue
+
+        def boolean hasDefaultValue() {
+            val value = try {
+                valueFunction.apply
+            } catch (Throwable t) {
+                null
+            }
+            return if (value == null && defaultValue == null) {
+                true
+            } else if (value != null && defaultValue != null) {
+                if (!type.isArray)
+                    valueFunction.apply == defaultValue
+                else switch defaultValue {
+                    byte[]    : Arrays.equals(value as byte[],    defaultValue as byte[])
+                    boolean[] : Arrays.equals(value as boolean[], defaultValue as boolean[])
+                    char[]    : Arrays.equals(value as char[],    defaultValue as char[])
+                    double[]  : Arrays.equals(value as double[],  defaultValue as double[])
+                    float[]   : Arrays.equals(value as float[],   defaultValue as float[])
+                    int[]     : Arrays.equals(value as int[],     defaultValue as int[])
+                    long[]    : Arrays.equals(value as long[],    defaultValue as long[])
+                    short[]   : Arrays.equals(value as short[],   defaultValue as short[])
+                    Object[]  : Arrays.deepEquals(value as Object[], defaultValue as Object[])
+                    default   : value.equals(defaultValue)
+                }
+            } else if (value == null || defaultValue == null) {
+                false
+            }
+        }
+
     }
 }
