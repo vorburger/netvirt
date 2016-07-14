@@ -260,13 +260,12 @@ class XtendBeanGenerator {
     }
 
     def newEmptyBeanForDefaultValues(Class<?> builderClass) {
-        // http://objenesis.org
-        // val ObjectInstantiator<?> builderClassInstantiator = objenesis.getInstantiatorOf(builderClass)
-        // builderClassInstantiator.newInstance
         try {
             builderClass.newInstance
         } catch (InstantiationException e) {
-            null
+            // http://objenesis.org
+            val ObjectInstantiator<?> builderClassInstantiator = objenesis.getInstantiatorOf(builderClass)
+            builderClassInstantiator.newInstance
         }
     }
 
