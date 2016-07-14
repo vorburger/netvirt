@@ -110,9 +110,9 @@ class XtendBeanGeneratorTest {
             ]'''.toString, g.getExpression(bean))
     }
 
+    // This currently only works if there is a Builder for such classes
+    // TODO retest in new @Test without a Builder as well; I think this may work, meanwhile?
     @Test def void beanWithMultiConstructor() {
-        // This currently only works if there is a Builder for such classes
-
         val bean1 = new BeanWithMultiConstructor("foobar")
         assertEquals('''
         (new BeanWithMultiConstructorBuilder => [
@@ -126,6 +126,10 @@ class XtendBeanGeneratorTest {
         ]).build()'''.toString, g.getExpression(bean2))
     }
 
+    @Test def void beanWithMultiMatchingConstructors() {
+        val bean = new BeanWithMultiMatchingConstructors("foobar", 123)
+        assertEquals("new BeanWithMultiMatchingConstructors(\"foobar\", 123)\n", g.getExpression(bean))
+    }
 
     @Accessors
     public static class Bean {
@@ -221,4 +225,23 @@ class XtendBeanGeneratorTest {
         }
     }
 
+    public static class BeanWithMultiMatchingConstructors {
+        @Accessors(PUBLIC_GETTER) final String name
+        @Accessors(PUBLIC_GETTER) final Integer id
+
+        new(String name, Integer id) {
+            this.name = name
+            this.id = id
+        }
+
+        new(String name) {
+            this.name = name
+            this.id = null
+        }
+
+        new(Integer id) {
+            this.name = null
+            this.id = id
+        }
+    }
 }
