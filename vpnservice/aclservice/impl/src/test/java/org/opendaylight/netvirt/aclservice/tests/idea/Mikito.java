@@ -15,7 +15,7 @@ import org.mockito.stubbing.Answer;
 
 /**
  * Mike's helper to easily create <a href=
- * "http://googletesting.blogspot.ch/2013/07/testing-on-toilet-know-your-test-doubles.html">Stubes
+ * "http://googletesting.blogspot.ch/2013/07/testing-on-toilet-know-your-test-doubles.html">Stubs
  * & Fakes</a>.
  *
  * <p>

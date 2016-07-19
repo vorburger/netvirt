@@ -37,7 +37,7 @@ class XtendBeanGeneratorFlowEntryObjectsTest {
         val actionInfo2 = (new ActionInfoBuilder => [
             actionKey = 2
             actionType = ActionType.nx_conntrack
-            actionValues = #[
+            actionValues += #[
                 "1",
                 "0",
                 "0",
@@ -45,6 +45,11 @@ class XtendBeanGeneratorFlowEntryObjectsTest {
             ]
         ]).build()
         assertEquals(actionInfo, actionInfo2)
+    }
+
+    @Test def void actionInfoKeyInFlow1() {
+        val actionInfoKey = FlowEntryObjects::flow1().instructionInfoList.get(0).actionInfos.get(0).actionKey
+        assertEquals(2, actionInfoKey)
     }
 
     @Test def void expressionString() {
@@ -57,7 +62,8 @@ class XtendBeanGeneratorFlowEntryObjectsTest {
                 instructionInfoList += #[
                     new InstructionInfo(InstructionType.apply_actions, #[
                         (new ActionInfoBuilder => [
-                            actionType = ActionType.nx_conntrack
+                            actionKey = 2
+                            actioType = ActionType.nx_conntrack
                             actionValues = #[
                                 "1",
                                 "0",
@@ -122,8 +128,9 @@ class XtendBeanGeneratorFlowEntryObjectsTest {
                 instructionInfoList += #[
                     new InstructionInfo(InstructionType.apply_actions, #[
                         (new ActionInfoBuilder => [
+                            actionKey = 2
                             actionType = ActionType.nx_conntrack
-                            actionValues = #[
+                            actionValues += #[
                                 "1",
                                 "0",
                                 "0",
@@ -138,37 +145,37 @@ class XtendBeanGeneratorFlowEntryObjectsTest {
                 matchInfoList = #[
                     (new MatchInfoBuilder => [
                         matchField = MatchFieldType.eth_type
-                        matchValues = #[
+                        matchValues += #[
                             2048L
                         ]
                     ]).build(),
                     (new MatchInfoBuilder => [
                         matchField = MatchFieldType.ip_proto
-                        matchValues = #[
+                        matchValues += #[
                             17L
                         ]
                     ]).build(),
                     (new MatchInfoBuilder => [
                         matchField = MatchFieldType.udp_dst
-                        matchValues = #[
+                        matchValues += #[
                             68L
                         ]
                     ]).build(),
                     (new MatchInfoBuilder => [
                         matchField = MatchFieldType.udp_src
-                        matchValues = #[
+                        matchValues += #[
                             67L
                         ]
                     ]).build(),
                     (new MatchInfoBuilder => [
                         matchField = MatchFieldType.eth_src
-                        stringMatchValues = #[
+                        stringMatchValues += #[
                             "0D:AA:D8:42:30:F3"
                         ]
                     ]).build(),
                     (new NxMatchInfoBuilder => [
                         matchField = NxMatchFieldType.ct_state
-                        matchValues = #[
+                        matchValues += #[
                             33L,
                             33L
                         ]

@@ -23,7 +23,7 @@ import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.
  */
 public class StateInterfaceBuilder extends InterfaceBuilder {
 
-    // TODO Use sth like FlowEntryObjects? Because actually this is stupid.. one cannot repeat all setters as covariants here - think again about this
+    // TODO REMOVE THIS; use sth like FlowEntryObjects? Because actually this is stupid.. one cannot repeat all setters as covariants here - think again about this
 
     @Override
     public StateInterfaceBuilder setName(final java.lang.String value) {
