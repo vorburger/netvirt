@@ -22,6 +22,7 @@ class StateInterfaceBuilderHelper {
     }
 
     def static newStateInterfaceInstanceIdentifier(String interfaceName) {
-        InstanceIdentifier.builder(InterfacesState).child(Interface, new InterfaceKey(interfaceName)).build    }
+        InstanceIdentifier.builder(InterfacesState).child(Interface, new InterfaceKey(interfaceName)).build
+    }
 
 }

@@ -17,6 +17,328 @@ class FlowEntryObjects {
         #[
             new FlowEntity(123bi) => [
                 cookie = 110100480bi
+                flowId = "Ingress_DHCP_Server_v4123_0D:AA:D8:42:30:F3__Permit_"
+                flowName = "ACL"
+                instructionInfoList = #[
+                    new InstructionInfo(InstructionType.apply_actions, #[
+                        (new ActionInfoBuilder => [
+                            actionKey = 2
+                            actionType = ActionType.nx_conntrack
+                            actionValues = #[
+                                "1",
+                                "0",
+                                "0",
+                                "255"
+                            ]
+                        ]).build()
+                    ]),
+                    new InstructionInfo(InstructionType.goto_table, #[
+                        252L
+                    ])
+                ]
+                matchInfoList = #[
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_type
+                        matchValues = #[
+                            2048L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.ip_proto
+                        matchValues = #[
+                            17L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.udp_dst
+                        matchValues = #[
+                            67L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.udp_src
+                        matchValues = #[
+                            68L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_dst
+                        stringMatchValues = #[
+                            "0D:AA:D8:42:30:F3"
+                        ]
+                    ]).build(),
+                    (new NxMatchInfoBuilder => [
+                        matchField = NxMatchFieldType.ct_state
+                        matchValues = #[
+                            33L,
+                            33L
+                        ]
+                    ]).build()
+                ]
+                priority = 61010
+                tableId = 251 as short
+            ],
+            new FlowEntity(123bi) => [
+                cookie = 110100480bi
+                flowId = "Ingress_DHCP_Server_v6_123_0D:AA:D8:42:30:F3___Permit_"
+                flowName = "ACL"
+                instructionInfoList = #[
+                    new InstructionInfo(InstructionType.apply_actions, #[
+                        (new ActionInfoBuilder => [
+                            actionKey = 2
+                            actionType = ActionType.nx_conntrack
+                            actionValues = #[
+                                "1",
+                                "0",
+                                "0",
+                                "255"
+                            ]
+                        ]).build()
+                    ]),
+                    new InstructionInfo(InstructionType.goto_table, #[
+                        252L
+                    ])
+                ]
+                matchInfoList = #[
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_type
+                        matchValues = #[
+                            2048L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.ip_proto
+                        matchValues = #[
+                            17L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.udp_dst
+                        matchValues = #[
+                            567L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.udp_src
+                        matchValues = #[
+                            568L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_dst
+                        stringMatchValues = #[
+                            "0D:AA:D8:42:30:F3"
+                        ]
+                    ]).build(),
+                    (new NxMatchInfoBuilder => [
+                        matchField = NxMatchFieldType.ct_state
+                        matchValues = #[
+                            33L,
+                            33L
+                        ]
+                    ]).build()
+                ]
+                priority = 61010
+                tableId = 251 as short
+            ],
+            new FlowEntity(123bi) => [
+                cookie = 110100480bi
+                flowId = "Ingress_Fixed_Conntrk_Untrk_123_0D:AA:D8:42:30:F3_Untracked"
+                flowName = "ACL"
+                instructionInfoList = #[
+                    new InstructionInfo(InstructionType.apply_actions, #[
+                        (new ActionInfoBuilder => [
+                            actionKey = 2
+                            actionType = ActionType.nx_conntrack
+                            actionValues = #[
+                                "0",
+                                "0",
+                                "0",
+                                "251"
+                            ]
+                        ]).build()
+                    ])
+                ]
+                matchInfoList = #[
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_type
+                        matchValues = #[
+                            2048L
+                        ]
+                    ]).build(),
+                    (new NxMatchInfoBuilder => [
+                        matchField = NxMatchFieldType.ct_state
+                        matchValues = #[
+                            0L,
+                            32L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_dst
+                        stringMatchValues = #[
+                            "0D:AA:D8:42:30:F3"
+                        ]
+                    ]).build()
+                ]
+                priority = 61010
+                tableId = 251 as short
+            ],
+            new FlowEntity(123bi) => [
+                cookie = 110100480bi
+                flowId = "Ingress_Fixed_Conntrk_Untrk_123_0D:AA:D8:42:30:F3_Tracked_Established"
+                flowName = "ACL"
+                instructionInfoList = #[
+                    new InstructionInfo(InstructionType.goto_table, #[
+                        252L
+                    ])
+                ]
+                matchInfoList = #[
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_type
+                        matchValues = #[
+                            2048L
+                        ]
+                    ]).build(),
+                    (new NxMatchInfoBuilder => [
+                        matchField = NxMatchFieldType.ct_state
+                        matchValues = #[
+                            34L,
+                            55L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_dst
+                        stringMatchValues = #[
+                            "0D:AA:D8:42:30:F3"
+                        ]
+                    ]).build()
+                ]
+                priority = 62020
+                tableId = 251 as short
+            ],
+            new FlowEntity(123bi) => [
+                cookie = 110100480bi
+                flowId = "Ingress_Fixed_Conntrk_Untrk_123_0D:AA:D8:42:30:F3_Tracked_Related"
+                flowName = "ACL"
+                instructionInfoList = #[
+                    new InstructionInfo(InstructionType.goto_table, #[
+                        252L
+                    ])
+                ]
+                matchInfoList = #[
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_type
+                        matchValues = #[
+                            2048L
+                        ]
+                    ]).build(),
+                    (new NxMatchInfoBuilder => [
+                        matchField = NxMatchFieldType.ct_state
+                        matchValues = #[
+                            36L,
+                            55L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_dst
+                        stringMatchValues = #[
+                            "0D:AA:D8:42:30:F3"
+                        ]
+                    ]).build()
+                ]
+                priority = 62020
+                tableId = 251 as short
+            ],
+            new FlowEntity(123bi) => [
+                cookie = 110100480bi
+                flowId = "Ingress_Fixed_Conntrk_NewDrop_123_0D:AA:D8:42:30:F3_Tracked_New"
+                flowName = "ACL"
+                instructionInfoList = #[
+                ]
+                matchInfoList = #[
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_type
+                        matchValues = #[
+                            2048L
+                        ]
+                    ]).build(),
+                    (new NxMatchInfoBuilder => [
+                        matchField = NxMatchFieldType.ct_state
+                        matchValues = #[
+                            33L,
+                            33L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_dst
+                        stringMatchValues = #[
+                            "0D:AA:D8:42:30:F3"
+                        ]
+                    ]).build()
+                ]
+                priority = 36007
+                tableId = 251 as short
+            ],
+            new FlowEntity(123bi) => [
+                cookie = 110100480bi
+                flowId = "Ingress_Fixed_Conntrk_NewDrop_123_0D:AA:D8:42:30:F3_Tracked_Invalid"
+                flowName = "ACL"
+                instructionInfoList = #[
+                ]
+                matchInfoList = #[
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_type
+                        matchValues = #[
+                            2048L
+                        ]
+                    ]).build(),
+                    (new NxMatchInfoBuilder => [
+                        matchField = NxMatchFieldType.ct_state
+                        matchValues = #[
+                            48L,
+                            48L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_dst
+                        stringMatchValues = #[
+                            "0D:AA:D8:42:30:F3"
+                        ]
+                    ]).build()
+                ]
+                priority = 36007
+                tableId = 251 as short
+            ],
+            new FlowEntity(123bi) => [
+                cookie = 110100480bi
+                flowId = "Ingress_ARP_123_0D:AA:D8:42:30:F3"
+                flowName = "ACL"
+                instructionInfoList = #[
+                    new InstructionInfo(InstructionType.goto_table, #[
+                        252L
+                    ])
+                ]
+                matchInfoList = #[
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.eth_type
+                        matchValues = #[
+                            2054L
+                        ]
+                    ]).build(),
+                    (new MatchInfoBuilder => [
+                        matchField = MatchFieldType.arp_tha
+                        stringMatchValues = #[
+                            "0D:AA:D8:42:30:F3"
+                        ]
+                    ]).build()
+                ]
+                priority = 61010
+                tableId = 251 as short
+            ],
+            new FlowEntity(123bi) => [
+                cookie = 110100480bi
+
+
                 flowId = "Egress_DHCP_Client_v4123_0D:AA:D8:42:30:F3__Permit_"
                 flowName = "ACL"
                 instructionInfoList += #[
