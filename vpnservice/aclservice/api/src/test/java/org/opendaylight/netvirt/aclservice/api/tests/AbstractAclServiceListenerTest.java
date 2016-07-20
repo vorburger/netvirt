@@ -7,11 +7,8 @@
  */
 package org.opendaylight.netvirt.aclservice.api.tests;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertFalse;
-import static org.opendaylight.netvirt.aclservice.api.tests.DataBrokerExtensions.put;
 import static org.opendaylight.netvirt.aclservice.api.tests.InterfaceBuilderHelper.newInterface;
-import static org.opendaylight.netvirt.aclservice.api.tests.StateInterfaceBuilderHelper.newStateInterfacePair;
 
 import org.junit.Test;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
@@ -28,13 +25,6 @@ public abstract class AbstractAclServiceListenerTest {
     protected DataBroker dataBroker;
     protected FakeIMdsalApiManager mdsalApiManager;
 
-
-    @Test public void applyToPortWithSecurityEnabled() {
-        put(dataBroker, newStateInterfacePair("port1", "0D:AA:D8:42:30:F3"));
-        assertThat(aclService.applyAcl(newInterface("port1", true))).isTrue();
-        assertThat(mdsalApiManager.getFlows())
-                .containsExactlyElementsIn(FlowEntryObjects.expectedFlows("0D:AA:D8:42:30:F3")).inOrder();
-    }
 
     @Test public void applyToPortWithSecurityDisabled() {
         Interface port1 = newInterface("port1", false);

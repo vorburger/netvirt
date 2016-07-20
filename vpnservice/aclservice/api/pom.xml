@@ -50,10 +50,22 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.opendaylight.controller</groupId>
+      <artifactId>sal-binding-broker-impl</artifactId>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.google.truth</groupId>
       <artifactId>truth</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.xtend</groupId>
+      <artifactId>org.eclipse.xtend.lib</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
 
   <build>

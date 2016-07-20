@@ -8,6 +8,7 @@
 package org.opendaylight.netvirt.aclservice.api.tests;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.opendaylight.genius.mdsalutil.FlowEntity;
 import org.opendaylight.genius.mdsalutil.interfaces.IMdsalApiManager;
@@ -29,9 +30,15 @@ public abstract class FakeIMdsalApiManager implements IMdsalApiManager {
 
     private List<FlowEntity> flows;
 
+    private synchronized List<FlowEntity> initializeFlows() {
+        // Must be synchronized because a test may well concurrently installFlow() and getFlows()
+        // Otherwise we see arbitrary ConcurrentModificationException for flows List.
+        return Collections.synchronizedList(new ArrayList<>());
+    }
+
     public List<FlowEntity> getFlows() {
         if (flows == null) {
-            flows = new ArrayList<>();
+            flows = initializeFlows();
         }
         return flows;
     }
