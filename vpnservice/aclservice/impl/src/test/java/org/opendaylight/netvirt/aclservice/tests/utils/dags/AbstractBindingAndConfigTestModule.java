@@ -82,9 +82,9 @@ public abstract class AbstractBindingAndConfigTestModule {
 
     @Provides
     @Singleton
-    Module module(DependencyResolver dependencyResolver, BindingAwareBroker bindingAwareBroker) {
+    Module module(ModuleFactory moduleFactory, DependencyResolver dependencyResolver,
+            BindingAwareBroker bindingAwareBroker) {
         BundleContext bundleContext = mock(BundleContext.class, EXCEPTION_ANSWER);
-        ModuleFactory moduleFactory = moduleFactory();
         return moduleFactory.createModule("TEST", dependencyResolver, bundleContext);
     }
 
@@ -98,5 +98,4 @@ public abstract class AbstractBindingAndConfigTestModule {
         return moduleInstance;
     }
 
-    protected abstract ModuleFactory moduleFactory();
 }

@@ -10,12 +10,6 @@ package org.opendaylight.netvirt.aclservice.tests;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
-import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.CONFIGURATION;
-import static org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType.OPERATIONAL;
-import static org.opendaylight.netvirt.aclservice.api.tests.DataBrokerExtensions.put;
-import static org.opendaylight.netvirt.aclservice.api.tests.InterfaceBuilderHelper.newInterfacePair;
-import static org.opendaylight.netvirt.aclservice.api.tests.StateInterfaceBuilderHelper.newStateInterfacePair;
-import static org.opendaylight.netvirt.aclservice.tests.utils.AssertBeans.assertEqualBeans;
 import static org.opendaylight.netvirt.aclservice.tests.utils.MockitoNotImplementedExceptionAnswer.EXCEPTION_ANSWER;
 
 import dagger.Component;
@@ -24,16 +18,11 @@ import dagger.Module;
 import dagger.Provides;
 import java.math.BigInteger;
 import java.util.concurrent.Future;
-import javax.inject.Inject;
 import javax.inject.Singleton;
-import org.junit.After;
 import org.junit.Rule;
-import org.junit.Test;
 import org.opendaylight.controller.config.spi.ModuleFactory;
-import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.genius.mdsalutil.interfaces.IMdsalApiManager;
 import org.opendaylight.netvirt.aclservice.api.tests.AbstractAclServiceTest;
-import org.opendaylight.netvirt.aclservice.api.tests.FlowEntryObjects;
 import org.opendaylight.netvirt.aclservice.api.tests.TestIMdsalApiManager;
 import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
 import org.opendaylight.netvirt.aclservice.tests.utils.DataBrokerTestModule;
@@ -49,14 +38,14 @@ import org.opendaylight.yangtools.yang.common.RpcResultBuilder;
 
 public class AclServiceImplTest extends AbstractAclServiceTest {
 
-    // TODO split what is in here partially up into parent
-    // AbstractAclServiceTest
-
     @Module
     static class TestDependenciesModule extends AbstractBindingAndConfigTestModule {
 
-        @Override
-        protected ModuleFactory moduleFactory() {
+        @Provides
+        @Singleton
+        ModuleFactory aclServiceImplModuleFactory(OdlInterfaceRpcService odlInterfaceRpcService) {
+            // We must depend on OdlInterfaceRpcService, even if we don't directly use it,
+            // because it is actually used, in AclServiceProvider, but through dynamic lookup instead of static.
             return new AclServiceImplModuleFactory();
         }
 
@@ -66,6 +55,9 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
             // Using "classical" Mockito here (could also implement this using
             // Mikito; useful if more complex; both are perfectly possible).
             OdlInterfaceRpcService odlInterfaceRpcService = mock(OdlInterfaceRpcService.class, EXCEPTION_ANSWER);
+            Future<RpcResult<GetDpidFromInterfaceOutput>> result = RpcResultBuilder
+                    .success(new GetDpidFromInterfaceOutputBuilder().setDpid(new BigInteger("123"))).buildFuture();
+            doReturn(result).when(odlInterfaceRpcService).getDpidFromInterface(any());
             registry.putInstance(odlInterfaceRpcService, OdlInterfaceRpcService.class);
             return odlInterfaceRpcService;
         }
@@ -93,35 +85,5 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
     }
 
     @Rule public InjectorRule injector = new InjectorRule(DaggerAclServiceImplTest_Configuration.create());
-
-    @Inject DataBroker dataBroker;
-    @Inject TestIMdsalApiManager mdsalApiManager;
-    @Inject OdlInterfaceRpcService odlInterfaceRpcService;
-    @Inject AutoCloseable serviceProvider;
-
-    @After
-    public void tearDown() throws Exception {
-        if (serviceProvider != null) {
-            serviceProvider.close();
-        }
-    }
-
-    @Test
-    public void newInterface() throws Exception {
-        // Given
-        put(dataBroker, CONFIGURATION, newInterfacePair("port1", true));
-
-        Future<RpcResult<GetDpidFromInterfaceOutput>> result = RpcResultBuilder
-                .success(new GetDpidFromInterfaceOutputBuilder().setDpid(new BigInteger("123"))).buildFuture();
-        doReturn(result).when(odlInterfaceRpcService).getDpidFromInterface(any());
-
-        // When
-        put(dataBroker, OPERATIONAL, newStateInterfacePair("port1", "0D:AA:D8:42:30:F3"));
-
-        // Then
-        // TODO must do better synchronization here.. this is multi-thread, must
-        // wait for completion - how-to? Use https://github.com/awaitility/awaitility, but wait on what?
-        assertEqualBeans(FlowEntryObjects.expectedFlows("0D:AA:D8:42:30:F3"), mdsalApiManager.getFlows());
-    }
 
 }

@@ -65,6 +65,12 @@ and is available at http://www.eclipse.org/legal/epl-v10.html
       <artifactId>org.eclipse.xtend.lib</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.google.dagger</groupId>
+      <artifactId>dagger</artifactId>
+      <!-- This version has to kept the same as com.google.dagger:dagger-compiler's -->
+      <version>2.5</version>
+    </dependency>
 
   </dependencies>
 
