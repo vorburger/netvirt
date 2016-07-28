@@ -13,7 +13,7 @@ import static org.opendaylight.netvirt.aclservice.tests.utils.MockitoNotImplemen
 import org.junit.Before;
 import org.opendaylight.netvirt.aclservice.EgressAclServiceImpl;
 import org.opendaylight.netvirt.aclservice.api.tests.AbstractAclServiceListenerTest;
-import org.opendaylight.netvirt.aclservice.api.tests.FakeIMdsalApiManager;
+import org.opendaylight.netvirt.aclservice.api.tests.TestIMdsalApiManager;
 import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
 import org.opendaylight.netvirt.aclservice.tests.utils.TestDataBroker;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.genius.interfacemanager.rpcs.rev160406.OdlInterfaceRpcService;
@@ -26,7 +26,7 @@ public class AclServiceListenerImplTest extends AbstractAclServiceListenerTest {
     @Before public void setUp() {
         dataBroker = TestDataBroker.newTestDataBroker();
         odlInterfaceRpcService = mock(OdlInterfaceRpcService.class, EXCEPTION_ANSWER);
-        mdsalApiManager = Mikito.stub(FakeIMdsalApiManager.class);
+        mdsalApiManager = Mikito.stub(TestIMdsalApiManager.class);
 
         aclService = new EgressAclServiceImpl(dataBroker, odlInterfaceRpcService, mdsalApiManager);
     }

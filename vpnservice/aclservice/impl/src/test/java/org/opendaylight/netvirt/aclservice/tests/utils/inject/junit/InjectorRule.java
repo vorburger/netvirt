@@ -20,6 +20,7 @@ import org.junit.runners.model.Statement;
  * <pre>
  * public class ExampleTest {
  *
+ *     &#064;Singleton
  *     &#064;Component(modules = TestModule1.class)
  *     interface Configuration extends MembersInjector&lt;ExampleTest&gt; {
  *         &#064;Override void injectMembers(ExampleTest test);

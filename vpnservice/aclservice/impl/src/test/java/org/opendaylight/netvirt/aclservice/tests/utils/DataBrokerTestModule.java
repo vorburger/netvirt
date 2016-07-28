@@ -2,6 +2,7 @@ package org.opendaylight.netvirt.aclservice.tests.utils;
 
 import dagger.Module;
 import dagger.Provides;
+import javax.inject.Singleton;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.test.AbstractDataBrokerTest;
 import org.opendaylight.netvirt.aclservice.tests.utils.inject.DaggerModuleProvideException;
@@ -11,7 +12,7 @@ public class DataBrokerTestModule {
 
     // Suppress IllegalCatch because of AbstractDataBrokerTest (change later)
     @SuppressWarnings("checkstyle:IllegalCatch")
-    static @Provides DataBroker dataBroker() throws DaggerModuleProvideException {
+    static @Provides @Singleton DataBroker dataBroker() throws DaggerModuleProvideException {
         try {
             // This is a little bit "upside down" - in the future,
             // we should probably put what is in AbstractDataBrokerTest

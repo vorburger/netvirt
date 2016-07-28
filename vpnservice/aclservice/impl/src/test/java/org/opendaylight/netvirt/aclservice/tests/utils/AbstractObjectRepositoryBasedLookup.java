@@ -7,17 +7,28 @@
  */
 package org.opendaylight.netvirt.aclservice.tests.utils;
 
+import javax.inject.Provider;
+
 public abstract class AbstractObjectRepositoryBasedLookup {
 
     private ObjectRegistry objectRepository;
+    private Provider<ObjectRegistry> objectRepositoryProvider;
 
-    public void setObjectRepository(ObjectRegistry objectRepository) {
+    public void setObjectRegistry(ObjectRegistry objectRepository) {
         this.objectRepository = objectRepository;
+    }
+
+    public void setObjectRegistryProvider(Provider<ObjectRegistry> objectRepositoryProvider) {
+        this.objectRepositoryProvider = objectRepositoryProvider;
     }
 
     protected ObjectRegistry getObjectRepository() {
         if (objectRepository == null) {
-            throw new IllegalStateException("Must call setObjectRepository() first");
+            if (objectRepositoryProvider == null) {
+                throw new IllegalStateException("Must call setObjectRepository() first");
+            } else {
+                objectRepository = objectRepositoryProvider.get();
+            }
         }
         return objectRepository;
     }

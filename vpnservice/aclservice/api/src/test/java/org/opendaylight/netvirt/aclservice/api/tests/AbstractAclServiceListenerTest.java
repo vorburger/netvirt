@@ -23,7 +23,7 @@ public abstract class AbstractAclServiceListenerTest {
 
     // Services which the test depends on (either to prepare test data into, or assert things from)
     protected DataBroker dataBroker;
-    protected FakeIMdsalApiManager mdsalApiManager;
+    protected TestIMdsalApiManager mdsalApiManager;
 
 
     @Test public void applyToPortWithSecurityDisabled() {

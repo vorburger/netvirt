@@ -15,11 +15,13 @@ import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
 /**
  * Something to look up Object instances in.
  *
- * <p>Elsewhere also known as a Guice Injector, Context in the Spring Framework or JNDI, etc.
+ * <p>Elsewhere also known as a Guice Injector, Context in the Spring Framework or JNDI, Dagger Component, etc.
  *
  * @author Michael Vorburger
  */
 public interface ObjectRegistry {
+
+    // TODO remove this now...
 
     // TODO (public static?) interface Reader { ... what's below
     // TODO (public static?) interface Writer { putInstance

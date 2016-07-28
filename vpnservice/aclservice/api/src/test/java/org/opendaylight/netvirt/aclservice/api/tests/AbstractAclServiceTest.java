@@ -7,10 +7,6 @@
  */
 package org.opendaylight.netvirt.aclservice.api.tests;
 
-import org.opendaylight.controller.md.sal.binding.test.AbstractDataBrokerTest;
+public abstract class AbstractAclServiceTest {
 
-public abstract class AbstractAclServiceTest extends AbstractDataBrokerTest {
-
-    // TODO AbstractDataBrokerTest should not have to be parent of this class,
-    // but @Rule / @Inject in AclServiceImplTest ..
 }

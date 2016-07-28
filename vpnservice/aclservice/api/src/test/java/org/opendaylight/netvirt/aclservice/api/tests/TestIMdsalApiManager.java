@@ -26,7 +26,7 @@ import org.opendaylight.genius.mdsalutil.interfaces.IMdsalApiManager;
  *
  * @author Michael Vorburger
  */
-public abstract class FakeIMdsalApiManager implements IMdsalApiManager {
+public abstract class TestIMdsalApiManager implements IMdsalApiManager {
 
     private List<FlowEntity> flows;
 
