@@ -9,12 +9,14 @@ import javax.inject.Singleton;
 import org.opendaylight.controller.config.api.DependencyResolver;
 import org.opendaylight.controller.config.spi.Module;
 import org.opendaylight.controller.config.spi.ModuleFactory;
+import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
 import org.opendaylight.controller.sal.binding.api.BindingAwareBroker.ProviderContext;
 import org.opendaylight.controller.sal.binding.api.BindingAwareProvider;
 import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
 import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRegistry;
+import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRegistryBuilder;
 import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRepositoryDependencyResolver;
 import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRepositoryProviderContext;
 import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRepositoryRpcProviderRegistry;
@@ -23,6 +25,20 @@ import org.osgi.framework.BundleContext;
 
 @dagger.Module
 public abstract class AbstractBindingAndConfigTestModule {
+
+    @Provides
+    @Singleton
+    ObjectRegistry.Builder objectRegistryBuilder(DataBroker dataBroker) {
+        ObjectRegistryBuilder builder = new ObjectRegistryBuilder();
+        builder.putInstance(dataBroker, DataBroker.class);
+        return builder;
+    }
+
+    @Provides
+    @Singleton
+    ObjectRegistry objectRegistry(ObjectRegistry.Builder registryBuilder) {
+        return registryBuilder.build();
+    }
 
     @Provides
     @Singleton

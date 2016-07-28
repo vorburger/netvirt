@@ -37,7 +37,6 @@ import org.opendaylight.netvirt.aclservice.api.tests.TestIMdsalApiManager;
 import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
 import org.opendaylight.netvirt.aclservice.tests.utils.DataBrokerTestModule;
 import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRegistry;
-import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRegistryBuilder;
 import org.opendaylight.netvirt.aclservice.tests.utils.dags.AbstractBindingAndConfigTestModule;
 import org.opendaylight.netvirt.aclservice.tests.utils.inject.junit.InjectorRule;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.genius.interfacemanager.rpcs.rev160406.GetDpidFromInterfaceOutput;
@@ -85,24 +84,6 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
     }
 
     @dagger.Module
-    // TODO factor this out into separate class.. but beware, few entries are specific to this test, rest generic
-    static class OldStyleNonDependencyInjectionModule {
-        @Provides
-        @Singleton
-        ObjectRegistry.Builder objectRegistryBuilder(DataBroker dataBroker) {
-            ObjectRegistryBuilder builder = new ObjectRegistryBuilder();
-            builder.putInstance(dataBroker, DataBroker.class);
-            return builder;
-        }
-
-        @Provides
-        @Singleton
-        ObjectRegistry objectRegistry(ObjectRegistry.Builder registryBuilder) {
-            return registryBuilder.build();
-        }
-    }
-
-    @dagger.Module
     static class BindingAndConfigTestModule extends AbstractBindingAndConfigTestModule {
         @Override
         protected ModuleFactory moduleFactory() {
@@ -112,8 +93,7 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
 
     @Singleton
     @Component(modules = { DataBrokerTestModule.class, BindingAndConfigTestModule.class,
-            IMdsalApiManagerTestModule.class, OldStyleNonDependencyInjectionModule.class,
-            TestDependenciesModule.class })
+            IMdsalApiManagerTestModule.class, TestDependenciesModule.class })
     interface Configuration extends MembersInjector<AclServiceImplTest> {
         @Override
         void injectMembers(AclServiceImplTest test);
