@@ -20,6 +20,7 @@ import static org.opendaylight.netvirt.aclservice.tests.utils.MockitoNotImplemen
 
 import dagger.Component;
 import dagger.MembersInjector;
+import dagger.Module;
 import dagger.Provides;
 import java.math.BigInteger;
 import java.util.concurrent.Future;
@@ -51,27 +52,28 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
     // TODO split what is in here partially up into parent
     // AbstractAclServiceTest
 
-    @dagger.Module
+    @Module
     static class TestDependenciesModule {
-        @Singleton
         @Provides
-        OdlInterfaceRpcService odlInterfaceRpcService(ObjectRegistry.Builder registryBuilder) {
+        @Singleton
+        OdlInterfaceRpcService odlInterfaceRpcService(ObjectRegistry.Builder registry) {
             // Using "classical" Mockito here (could also implement this using
             // Mikito; useful if more complex; both are perfectly possible).
             OdlInterfaceRpcService odlInterfaceRpcService = mock(OdlInterfaceRpcService.class, EXCEPTION_ANSWER);
-            registryBuilder.putInstance(odlInterfaceRpcService, OdlInterfaceRpcService.class);
+            registry.putInstance(odlInterfaceRpcService, OdlInterfaceRpcService.class);
             return odlInterfaceRpcService;
         }
 
-        @Singleton
         @Provides
-        TestIMdsalApiManager fakeMdsalApiManager(ObjectRegistry.Builder registryBuilder) {
+        @Singleton
+        TestIMdsalApiManager fakeMdsalApiManager(ObjectRegistry.Builder registry) {
             TestIMdsalApiManager mdsalApiManager = Mikito.stub(TestIMdsalApiManager.class);
-            registryBuilder.putInstance(mdsalApiManager, IMdsalApiManager.class);
+            registry.putInstance(mdsalApiManager, IMdsalApiManager.class);
             return mdsalApiManager;
         }
 
         @Provides
+        @Singleton
         IMdsalApiManager mdsalApiManager(TestIMdsalApiManager fake) {
             return fake;
         }

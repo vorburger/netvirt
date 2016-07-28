@@ -25,8 +25,7 @@ import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
 public interface ObjectRegistry {
 
     interface Builder {
-        <T> void putInstance(T object, Class<T> lookupType, Class<T>... additionalLookupTypes)
-                throws IllegalArgumentException;
+        <T> void putInstance(T object, Class<T> lookupType) throws IllegalArgumentException;
 
         ObjectRegistry build();
     }
@@ -56,20 +55,12 @@ public interface ObjectRegistry {
         }
 
         @Override
-        public final <T> void putInstance(T object, Class<T> lookupType, Class<T>... additionalLookupTypes)
-                throws IllegalArgumentException {
-            checkedPutInstance(lookupType, object);
-            for (Class<T> additionalLookupType : additionalLookupTypes) {
-                checkedPutInstance(additionalLookupType, object);
+        public final <T> void putInstance(T object, Class<T> lookupType) throws IllegalArgumentException {
+            if (map.containsKey(lookupType)) {
+                throw new IllegalArgumentException("Registry already has an Object for type " + lookupType.getName()
+                        + ": " + map.getInstance(lookupType).toString());
             }
-        }
-
-        private <T> void checkedPutInstance(Class<T> type, T object) throws IllegalArgumentException {
-            if (map.containsKey(type)) {
-                throw new IllegalArgumentException("Registry already has an Object for type " + type.getName() + ": "
-                        + map.getInstance(type).toString());
-            }
-            map.putInstance(type, object);
+            map.putInstance(lookupType, object);
         }
 
         @Override
