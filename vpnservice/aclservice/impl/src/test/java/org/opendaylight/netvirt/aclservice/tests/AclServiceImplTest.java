@@ -53,7 +53,13 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
     // AbstractAclServiceTest
 
     @Module
-    static class TestDependenciesModule {
+    static class TestDependenciesModule extends AbstractBindingAndConfigTestModule {
+
+        @Override
+        protected ModuleFactory moduleFactory() {
+            return new AclServiceImplModuleFactory();
+        }
+
         @Provides
         @Singleton
         OdlInterfaceRpcService odlInterfaceRpcService(ObjectRegistry.Builder registry) {
@@ -79,16 +85,8 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
         }
     }
 
-    @dagger.Module
-    static class BindingAndConfigTestModule extends AbstractBindingAndConfigTestModule {
-        @Override
-        protected ModuleFactory moduleFactory() {
-            return new AclServiceImplModuleFactory();
-        }
-    }
-
     @Singleton
-    @Component(modules = { TestDependenciesModule.class, BindingAndConfigTestModule.class, DataBrokerTestModule.class })
+    @Component(modules = { TestDependenciesModule.class, DataBrokerTestModule.class })
     interface Configuration extends MembersInjector<AclServiceImplTest> {
         @Override
         void injectMembers(AclServiceImplTest test);
