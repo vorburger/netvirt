@@ -63,12 +63,6 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
             return odlInterfaceRpcService;
         }
 
-    }
-
-    @dagger.Module
-    // TODO make this an inner class of FakeIMdsalApiManager (needs stuff to
-    // move around first)
-    static class IMdsalApiManagerTestModule {
         @Singleton
         @Provides
         TestIMdsalApiManager fakeMdsalApiManager(ObjectRegistry.Builder registryBuilder) {
@@ -92,8 +86,7 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
     }
 
     @Singleton
-    @Component(modules = { DataBrokerTestModule.class, BindingAndConfigTestModule.class,
-            IMdsalApiManagerTestModule.class, TestDependenciesModule.class })
+    @Component(modules = { TestDependenciesModule.class, BindingAndConfigTestModule.class, DataBrokerTestModule.class })
     interface Configuration extends MembersInjector<AclServiceImplTest> {
         @Override
         void injectMembers(AclServiceImplTest test);
