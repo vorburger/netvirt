@@ -26,16 +26,20 @@ public abstract class AbstractBindingAndConfigTestModule {
 
     @Provides
     @Singleton
-    BindingAwareBroker bindingAwareBroker() {
-        return Mikito.stub(TestBindingAwareBroker.class);
+    BindingAwareBroker bindingAwareBroker(ObjectRegistry.Builder registryBuilder) {
+        TestBindingAwareBroker bindingAwareBroker = Mikito.stub(TestBindingAwareBroker.class);
+        registryBuilder.putInstance(bindingAwareBroker, BindingAwareBroker.class);
+        return bindingAwareBroker;
     }
 
     @Provides
     @Singleton
-    RpcProviderRegistry rpcProviderRegistry(Provider<ObjectRegistry> objectRepositoryProvider) {
+    RpcProviderRegistry rpcProviderRegistry(Provider<ObjectRegistry> objectRepositoryProvider,
+            ObjectRegistry.Builder registryBuilder) {
         ObjectRepositoryRpcProviderRegistry rpcProviderRegistry = Mikito
                 .stub(ObjectRepositoryRpcProviderRegistry.class);
         rpcProviderRegistry.setObjectRegistryProvider(objectRepositoryProvider);
+        registryBuilder.putInstance(rpcProviderRegistry, RpcProviderRegistry.class);
         return rpcProviderRegistry;
     }
 
@@ -55,9 +59,14 @@ public abstract class AbstractBindingAndConfigTestModule {
         return sessionProviderContext;
     }
 
+    // The registryBuilder & bindingAwareBroker ARE dependencies of the Module
+    // (Instance), just not explicit, but dynamic. By listing them here anyway,
+    // even though not used in the body, DI engine can figure out requirements
+    // and correct ordering.
+
     @Provides
     @Singleton
-    Module module(DependencyResolver dependencyResolver) {
+    Module module(DependencyResolver dependencyResolver, BindingAwareBroker bindingAwareBroker) {
         BundleContext bundleContext = mock(BundleContext.class, EXCEPTION_ANSWER);
         ModuleFactory moduleFactory = moduleFactory();
         return moduleFactory.createModule("TEST", dependencyResolver, bundleContext);
@@ -65,7 +74,8 @@ public abstract class AbstractBindingAndConfigTestModule {
 
     @Provides
     @Singleton
-    AutoCloseable moduleInstance(Module module, ProviderContext providerContext) {
+    AutoCloseable moduleInstance(Module module, ProviderContext providerContext,
+            RpcProviderRegistry rpcProviderRegistry) {
         AutoCloseable moduleInstance = module.getInstance();
         BindingAwareProvider serviceProviderAsBindingAwareProvider = (BindingAwareProvider) moduleInstance;
         serviceProviderAsBindingAwareProvider.onSessionInitiated(providerContext);

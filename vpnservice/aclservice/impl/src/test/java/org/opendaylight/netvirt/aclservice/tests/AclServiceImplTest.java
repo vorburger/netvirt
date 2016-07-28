@@ -30,8 +30,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.opendaylight.controller.config.spi.ModuleFactory;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
-import org.opendaylight.controller.sal.binding.api.BindingAwareBroker;
-import org.opendaylight.controller.sal.binding.api.RpcProviderRegistry;
 import org.opendaylight.genius.mdsalutil.interfaces.IMdsalApiManager;
 import org.opendaylight.netvirt.aclservice.api.tests.AbstractAclServiceTest;
 import org.opendaylight.netvirt.aclservice.api.tests.FlowEntryObjects;
@@ -39,7 +37,7 @@ import org.opendaylight.netvirt.aclservice.api.tests.TestIMdsalApiManager;
 import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
 import org.opendaylight.netvirt.aclservice.tests.utils.DataBrokerTestModule;
 import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRegistry;
-import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRegistry.SimpleObjectRegistry;
+import org.opendaylight.netvirt.aclservice.tests.utils.ObjectRegistryBuilder;
 import org.opendaylight.netvirt.aclservice.tests.utils.dags.AbstractBindingAndConfigTestModule;
 import org.opendaylight.netvirt.aclservice.tests.utils.inject.junit.InjectorRule;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.genius.interfacemanager.rpcs.rev160406.GetDpidFromInterfaceOutput;
@@ -58,10 +56,12 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
     static class TestDependenciesModule {
         @Singleton
         @Provides
-        OdlInterfaceRpcService odlInterfaceRpcService() {
+        OdlInterfaceRpcService odlInterfaceRpcService(ObjectRegistry.Builder registryBuilder) {
             // Using "classical" Mockito here (could also implement this using
             // Mikito; useful if more complex; both are perfectly possible).
-            return mock(OdlInterfaceRpcService.class, EXCEPTION_ANSWER);
+            OdlInterfaceRpcService odlInterfaceRpcService = mock(OdlInterfaceRpcService.class, EXCEPTION_ANSWER);
+            registryBuilder.putInstance(odlInterfaceRpcService, OdlInterfaceRpcService.class);
+            return odlInterfaceRpcService;
         }
 
     }
@@ -72,8 +72,10 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
     static class IMdsalApiManagerTestModule {
         @Singleton
         @Provides
-        TestIMdsalApiManager fakeMdsalApiManager() {
-            return Mikito.stub(TestIMdsalApiManager.class);
+        TestIMdsalApiManager fakeMdsalApiManager(ObjectRegistry.Builder registryBuilder) {
+            TestIMdsalApiManager mdsalApiManager = Mikito.stub(TestIMdsalApiManager.class);
+            registryBuilder.putInstance(mdsalApiManager, IMdsalApiManager.class);
+            return mdsalApiManager;
         }
 
         @Provides
@@ -87,20 +89,16 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
     static class OldStyleNonDependencyInjectionModule {
         @Provides
         @Singleton
-        ObjectRegistry simpleObjectRegistry(IMdsalApiManager mdsalApiManager,
-                DataBroker dataBroker, BindingAwareBroker bindingAwareBroker, RpcProviderRegistry rpcProviderRegistry,
-                OdlInterfaceRpcService odlInterfaceRpcService) {
-            SimpleObjectRegistry registry = new ObjectRegistry.SimpleObjectRegistry();
-            registry.putInstance(dataBroker, DataBroker.class);
+        ObjectRegistry.Builder objectRegistryBuilder(DataBroker dataBroker) {
+            ObjectRegistryBuilder builder = new ObjectRegistryBuilder();
+            builder.putInstance(dataBroker, DataBroker.class);
+            return builder;
+        }
 
-            // TODO can we break this out somewhere else?
-            registry.putInstance(bindingAwareBroker, BindingAwareBroker.class);
-            registry.putInstance(rpcProviderRegistry, RpcProviderRegistry.class);
-
-            registry.putInstance(mdsalApiManager, IMdsalApiManager.class);
-            registry.putInstance(odlInterfaceRpcService, OdlInterfaceRpcService.class);
-
-            return registry;
+        @Provides
+        @Singleton
+        ObjectRegistry objectRegistry(ObjectRegistry.Builder registryBuilder) {
+            return registryBuilder.build();
         }
     }
 
@@ -121,18 +119,11 @@ public class AclServiceImplTest extends AbstractAclServiceTest {
         void injectMembers(AclServiceImplTest test);
     }
 
-    @Rule
-    public InjectorRule injector = new InjectorRule(DaggerAclServiceImplTest_Configuration.create());
+    @Rule public InjectorRule injector = new InjectorRule(DaggerAclServiceImplTest_Configuration.create());
 
-    @Inject
-    DataBroker dataBroker;
-
-    @Inject
-    TestIMdsalApiManager mdsalApiManager;
-
-    @Inject
-    OdlInterfaceRpcService odlInterfaceRpcService;
-
+    @Inject DataBroker dataBroker;
+    @Inject TestIMdsalApiManager mdsalApiManager;
+    @Inject OdlInterfaceRpcService odlInterfaceRpcService;
     @Inject AutoCloseable serviceProvider;
 
     @After

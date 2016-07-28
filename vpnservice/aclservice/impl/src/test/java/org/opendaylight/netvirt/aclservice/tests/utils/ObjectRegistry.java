@@ -8,6 +8,7 @@
 package org.opendaylight.netvirt.aclservice.tests.utils;
 
 import com.google.common.collect.ClassToInstanceMap;
+import com.google.common.collect.ImmutableClassToInstanceMap;
 import com.google.common.collect.MutableClassToInstanceMap;
 import java.util.Optional;
 import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
@@ -15,16 +16,20 @@ import org.opendaylight.netvirt.aclservice.tests.idea.Mikito;
 /**
  * Something to look up Object instances in.
  *
- * <p>Elsewhere also known as a Guice Injector, Context in the Spring Framework or JNDI, Dagger Component, etc.
+ * <p>
+ * Elsewhere also known as a Guice Injector, Context in the Spring Framework or
+ * JNDI, Dagger Component, etc.
  *
  * @author Michael Vorburger
  */
 public interface ObjectRegistry {
 
-    // TODO remove this now...
+    interface Builder {
+        <T> void putInstance(T object, Class<T> lookupType, Class<T>... additionalLookupTypes)
+                throws IllegalArgumentException;
 
-    // TODO (public static?) interface Reader { ... what's below
-    // TODO (public static?) interface Writer { putInstance
+        ObjectRegistry build();
+    }
 
     <T> Optional<T> getInstanceOptional(Class<T> expectedType);
 
@@ -33,11 +38,24 @@ public interface ObjectRegistry {
             () -> new IllegalStateException("No object of this type registered: " + expectedType.getName()));
     }
 
-    class SimpleObjectRegistry implements ObjectRegistry {
+    class SimpleObjectRegistry implements ObjectRegistry, Builder {
 
-        private final ClassToInstanceMap<Object> map = MutableClassToInstanceMap.create();
+        private final ClassToInstanceMap<Object> map;
 
-        @SafeVarargs
+        public SimpleObjectRegistry() {
+            map = MutableClassToInstanceMap.create();
+        }
+
+        SimpleObjectRegistry(SimpleObjectRegistry original) {
+            map = ImmutableClassToInstanceMap.copyOf(original.map);
+        }
+
+        @Override
+        public ObjectRegistry build() {
+            return this;
+        }
+
+        @Override
         public final <T> void putInstance(T object, Class<T> lookupType, Class<T>... additionalLookupTypes)
                 throws IllegalArgumentException {
             checkedPutInstance(lookupType, object);
