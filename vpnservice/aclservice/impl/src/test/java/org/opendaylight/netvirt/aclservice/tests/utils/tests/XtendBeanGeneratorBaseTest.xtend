@@ -9,18 +9,18 @@ package org.opendaylight.netvirt.aclservice.tests.utils.tests
 
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
+import org.junit.Ignore
 import org.junit.Test
 import org.opendaylight.genius.mdsalutil.ActionInfo
 import org.opendaylight.genius.mdsalutil.ActionInfoBuilder
-import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator
 import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorTest.Bean
 import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorTest.BeanWithMultiConstructor
 import org.opendaylight.netvirt.aclservice.tests.utils.tests.XtendBeanGeneratorTest.BeanWithMultiConstructorBuilder
+import somewhere.testutils.xtend.XtendBeanGenerator
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertTrue
-import org.junit.Ignore
 
 /**
  * Unit test for basic XtendBeanGenerator.

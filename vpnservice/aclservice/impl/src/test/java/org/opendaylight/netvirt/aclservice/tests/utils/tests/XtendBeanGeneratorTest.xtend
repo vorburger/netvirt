@@ -12,10 +12,9 @@ import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.junit.Test
-import org.opendaylight.netvirt.aclservice.tests.utils.XtendBeanGenerator
+import somewhere.testutils.xtend.XtendBeanGenerator
 
 import static org.junit.Assert.assertEquals
-import org.opendaylight.netvirt.aclservice.tests.utils.tests.BeanWithBuilderBuilder.BeanWithBuilderImpl
 
 /**
  * Unit test / demo for XtendBeanGenerator.
