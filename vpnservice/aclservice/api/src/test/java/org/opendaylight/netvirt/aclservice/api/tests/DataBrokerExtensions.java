@@ -14,7 +14,9 @@ import org.opendaylight.genius.mdsalutil.MDSALUtil;
 import org.opendaylight.yangtools.yang.binding.DataObject;
 import org.opendaylight.yangtools.yang.binding.InstanceIdentifier;
 
-public class DataBrokerExtensions {
+public final class DataBrokerExtensions {
+
+    private DataBrokerExtensions() { }
 
     public static <T extends DataObject> void put(DataBroker dataBroker, LogicalDatastoreType type,
             Pair<InstanceIdentifier<T>, T> pair) {

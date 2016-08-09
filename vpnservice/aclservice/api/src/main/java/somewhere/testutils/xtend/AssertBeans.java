@@ -35,7 +35,7 @@ import org.junit.ComparisonFailure;
  *
  * @author Michael Vorburger
  */
-public class AssertBeans {
+public final class AssertBeans {
 
     /**
      * Asserts that two JavaBean objects are equal. If they are not, an
