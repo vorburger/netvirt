@@ -8,41 +8,45 @@
 package org.opendaylight.netvirt.aclservice.api.utils;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Objects;
+import java.util.Optional;
+import org.eclipse.jdt.annotation.Nullable;
 import org.opendaylight.yang.gen.v1.urn.ietf.params.xml.ns.yang.ietf.yang.types.rev130715.Uuid;
 import org.opendaylight.yang.gen.v1.urn.opendaylight.netvirt.aclservice.rev160608.interfaces._interface.AllowedAddressPairs;
 
 /**
  * The Class AclInterface.
  */
+// @NonNullByDefault({})
 public class AclInterface {
 
     /** The port security enabled. */
-    Boolean portSecurityEnabled;
+    private @Nullable Boolean portSecurityEnabled;
 
     /** The interface id. */
-    String interfaceId;
+    private @Nullable String interfaceId;
 
     /** The l port tag. */
-    Integer lportTag;
+    private @Nullable Integer lportTag;
 
     /** The dp id. */
-    BigInteger dpId;
+    private @Nullable BigInteger dpId;
 
     /** The security groups. */
-    List<Uuid> securityGroups;
+    private final List<Uuid> securityGroups = new ArrayList<>();
 
     /** The allowed address pairs. */
-    List<AllowedAddressPairs> allowedAddressPairs;
+    private final List<AllowedAddressPairs> allowedAddressPairs = new ArrayList<>();
 
     /**
      * Checks if is port security enabled.
      *
      * @return the boolean
      */
-    public Boolean isPortSecurityEnabled() {
-        return portSecurityEnabled;
+    public Optional<Boolean> isPortSecurityEnabled() {
+        return Optional.ofNullable(portSecurityEnabled);
     }
 
     /**
@@ -50,8 +54,8 @@ public class AclInterface {
      *
      * @return the port security enabled
      */
-    public Boolean getPortSecurityEnabled() {
-        return portSecurityEnabled;
+    public Optional<Boolean> getPortSecurityEnabled() {
+        return Optional.ofNullable(portSecurityEnabled);
     }
 
     /**
@@ -68,8 +72,8 @@ public class AclInterface {
      *
      * @return the interface id
      */
-    public String getInterfaceId() {
-        return interfaceId;
+    public Optional<String> getInterfaceId() {
+        return Optional.ofNullable(interfaceId);
     }
 
     /**
@@ -86,8 +90,8 @@ public class AclInterface {
      *
      * @return the l port tag
      */
-    public Integer getLPortTag() {
-        return lportTag;
+    public Optional<Integer> getLPortTag() {
+        return Optional.ofNullable(lportTag);
     }
 
     /**
@@ -104,8 +108,8 @@ public class AclInterface {
      *
      * @return the dp id
      */
-    public BigInteger getDpId() {
-        return dpId;
+    public Optional<BigInteger> getDpId() {
+        return Optional.ofNullable(dpId);
     }
 
     /**
@@ -127,15 +131,6 @@ public class AclInterface {
     }
 
     /**
-     * Sets the security groups.
-     *
-     * @param securityGroups the new security groups
-     */
-    public void setSecurityGroups(List<Uuid> securityGroups) {
-        this.securityGroups = securityGroups;
-    }
-
-    /**
      * Gets the allowed address pairs.
      *
      * @return the allowed address pairs
@@ -144,94 +139,23 @@ public class AclInterface {
         return allowedAddressPairs;
     }
 
-    /**
-     * Sets the allowed address pairs.
-     *
-     * @param allowedAddressPairs the new allowed address pairs
-     */
-    public void setAllowedAddressPairs(List<AllowedAddressPairs> allowedAddressPairs) {
-        this.allowedAddressPairs = allowedAddressPairs;
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((portSecurityEnabled == null) ? 0 : portSecurityEnabled.hashCode());
-        result = prime * result + ((dpId == null) ? 0 : dpId.hashCode());
-        result = prime * result + ((interfaceId == null) ? 0 : interfaceId.hashCode());
-        result = prime * result + ((lportTag == null) ? 0 : lportTag.hashCode());
-        result = prime * result + ((securityGroups == null) ? 0 : securityGroups.hashCode());
-        result = prime * result + ((allowedAddressPairs == null) ? 0 : allowedAddressPairs.hashCode());
-        return result;
+        return Objects.hash(portSecurityEnabled, dpId, interfaceId, lportTag, securityGroups, allowedAddressPairs);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        AclInterface other = (AclInterface) obj;
-        if (portSecurityEnabled == null) {
-            if (other.portSecurityEnabled != null) {
-                return false;
-            }
-        } else if (!portSecurityEnabled.equals(other.portSecurityEnabled)) {
-            return false;
-        }
-        if (dpId == null) {
-            if (other.dpId != null) {
-                return false;
-            }
-        } else if (!dpId.equals(other.dpId)) {
-            return false;
-        }
-        if (interfaceId == null) {
-            if (other.interfaceId != null) {
-                return false;
-            }
-        } else if (!interfaceId.equals(other.interfaceId)) {
-            return false;
-        }
-        if (lportTag == null) {
-            if (other.lportTag != null) {
-                return false;
-            }
-        } else if (!lportTag.equals(other.lportTag)) {
-            return false;
-        }
-        if (securityGroups == null) {
-            if (other.securityGroups != null) {
-                return false;
-            }
-        } else if (!securityGroups.equals(other.securityGroups)) {
-            return false;
-        }
-        if (allowedAddressPairs == null) {
-            if (other.allowedAddressPairs != null) {
-                return false;
-            }
-        } else if (!allowedAddressPairs.equals(other.allowedAddressPairs)) {
-            return false;
-        }
-        return true;
+    public boolean equals(@Nullable Object obj) {
+        return MoreObjects2.equalsHelper(this, obj, (one, another) ->
+               Objects.equals(one.portSecurityEnabled, another.portSecurityEnabled)
+            && Objects.equals(one.dpId, another.dpId)
+            && Objects.equals(one.interfaceId, another.interfaceId)
+            && Objects.equals(one.lportTag, another.lportTag)
+            && Objects.equals(one.securityGroups, another.securityGroups)
+            && Objects.equals(one.allowedAddressPairs, another.allowedAddressPairs)
+        );
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
     @Override
     public String toString() {
         return "AclInterface [portSecurityEnabled=" + portSecurityEnabled + ", interfaceId=" + interfaceId
