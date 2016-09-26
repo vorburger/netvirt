@@ -16,4 +16,10 @@
                             default-config-file-name="netvirt-aclservice-config.xml">
   </odl:clustered-app-config>
 
+  <bean id="bootstrap" class="org.opendaylight.netvirt.aclservice.wiring.Bootstrap" destroy-method="stop">
+     <argument ref="dataBroker" />
+     <argument ref="iMdsalApiManager" />
+     <argument ref="entityOwnershipService" />
+     <argument ref="aclserviceConfig" />
+  </bean>
 </blueprint>

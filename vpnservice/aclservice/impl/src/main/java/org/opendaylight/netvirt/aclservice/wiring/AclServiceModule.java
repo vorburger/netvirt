@@ -5,7 +5,7 @@
  * terms of the Eclipse Public License v1.0 which accompanies this distribution,
  * and is available at http://www.eclipse.org/legal/epl-v10.html
  */
-package org.opendaylight.netvirt.aclservice.tests;
+package org.opendaylight.netvirt.aclservice.wiring;
 
 import com.google.inject.AbstractModule;
 import com.mycila.guice.ext.closeable.CloseableModule;
@@ -16,6 +16,8 @@ import org.opendaylight.netvirt.aclservice.listeners.AclEventListener;
 import org.opendaylight.netvirt.aclservice.listeners.AclInterfaceListener;
 import org.opendaylight.netvirt.aclservice.listeners.AclInterfaceStateListener;
 import org.opendaylight.netvirt.aclservice.listeners.AclNodeListener;
+import org.opendaylight.netvirt.aclservice.utils.AclClusterUtil;
+import org.opendaylight.netvirt.aclservice.utils.AclClusterUtilImpl;
 
 /**
  * Main (non-Test) Dependency Injection (DI) Wiring (currently through Guice).
@@ -41,6 +43,9 @@ public class AclServiceModule extends AbstractModule {
         bind(AclNodeListener.class).asEagerSingleton();
         bind(AclInterfaceListener.class).asEagerSingleton();
         bind(AclEventListener.class).asEagerSingleton();
+
+        bind(AclClusterUtil.class).to(AclClusterUtilImpl.class).asEagerSingleton();
+
     }
 
 }
