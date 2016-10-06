@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import javax.inject.Inject;
 import org.opendaylight.controller.md.sal.binding.api.DataBroker;
 import org.opendaylight.controller.md.sal.binding.api.ReadOnlyTransaction;
 import org.opendaylight.controller.md.sal.common.api.data.LogicalDatastoreType;
@@ -80,11 +81,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("deprecation")
-public final class AclServiceUtils {
+public class AclServiceUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(AclServiceUtils.class);
 
-    private AclServiceUtils() { }
+    private final AclDataUtil aclDataUtil;
+
+    @Inject
+    public AclServiceUtils(AclDataUtil aclDataUtil) {
+        super();
+        this.aclDataUtil = aclDataUtil;
+    }
 
     /**
      * Retrieves the Interface from the datastore.
@@ -450,11 +457,11 @@ public final class AclServiceUtils {
             if (ipPrefix.getIpv4Prefix() != null) {
                 flowMatches.add(new MatchInfo(MatchFieldType.eth_type, new long[] {NwConstants.ETHTYPE_IPV4}));
                 String[] ipaddressValues = ipPrefix.getIpv4Prefix().getValue().split("/");
-                matchFieldType = (matchCriteria == MatchCriteria.MATCH_SOURCE)
+                matchFieldType = matchCriteria == MatchCriteria.MATCH_SOURCE
                         ? MatchFieldType.ipv4_source : MatchFieldType.ipv4_destination;
                 flowMatches.add(new MatchInfo(matchFieldType, new String[] {ipaddressValues[0], ipaddressValues[1]}));
             } else {
-                matchFieldType = (matchCriteria == MatchCriteria.MATCH_SOURCE)
+                matchFieldType = matchCriteria == MatchCriteria.MATCH_SOURCE
                         ? MatchFieldType.ipv6_source : MatchFieldType.ipv6_destination;
                 String[] ipv6addressValues = ipPrefix.getIpv6Prefix().getValue().split("/");
                 IPv6Address ipv6Address = IPv6Address.fromString(ipv6addressValues[0]);
@@ -467,13 +474,13 @@ public final class AclServiceUtils {
         } else {
             IpAddress ipAddress = ipPrefixOrAddress.getIpAddress();
             if (ipAddress.getIpv4Address() != null) {
-                matchFieldType = (matchCriteria == MatchCriteria.MATCH_SOURCE)
+                matchFieldType = matchCriteria == MatchCriteria.MATCH_SOURCE
                         ? MatchFieldType.ipv4_source : MatchFieldType.ipv4_destination;
                 flowMatches.add(new MatchInfo(MatchFieldType.eth_type, new long[] {NwConstants.ETHTYPE_IPV4}));
                 flowMatches.add(new MatchInfo(matchFieldType,
                         new String[] {ipAddress.getIpv4Address().getValue(), "32"}));
             } else {
-                matchFieldType = (matchCriteria == MatchCriteria.MATCH_SOURCE)
+                matchFieldType = matchCriteria == MatchCriteria.MATCH_SOURCE
                         ? MatchFieldType.ipv6_source : MatchFieldType.ipv6_destination;
                 flowMatches.add(new MatchInfo(MatchFieldType.eth_type, new long[] {NwConstants.ETHTYPE_IPV6}));
                 flowMatches.add(new MatchInfo(matchFieldType,
@@ -510,11 +517,11 @@ public final class AclServiceUtils {
         return remoteAclRuleList;
     }
 
-    public static Map<String, List<MatchInfoBase>> getFlowForRemoteAcl(Uuid remoteAclId, String ignoreInterfaceId,
+    public Map<String, List<MatchInfoBase>> getFlowForRemoteAcl(Uuid remoteAclId, String ignoreInterfaceId,
                                                                        Map<String, List<MatchInfoBase>>
                                                                                flowMatchesMap, boolean
                                                                                isSourceIpMacMatch) {
-        List<AclInterface> interfaceList = AclDataUtil.getInterfaceList(remoteAclId);
+        List<AclInterface> interfaceList = aclDataUtil.getInterfaceList(remoteAclId);
         if (flowMatchesMap == null || interfaceList == null || interfaceList.isEmpty()) {
             return null;
         }
